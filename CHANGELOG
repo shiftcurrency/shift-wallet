@@ -1,0 +1,7 @@
+* 0.9.1 - add transaction details + minor dialog fixes
+
+* 0.9.0 - fix transaction issues, add logs and gas value input
+
+* 0.8.1 - fix transaction value formatting
+
+* 0.8.0 - initial release

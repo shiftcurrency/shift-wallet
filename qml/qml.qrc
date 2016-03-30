@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>components/ErrorDialog.qml</file>
+        <file>components/PasswordDialog.qml</file>
+        <file>components/AccountsTab.qml</file>
+        <file>components/TransactionsTab.qml</file>
+        <file>components/SettingsTab.qml</file>
+        <file>components/ConfirmDialog.qml</file>
+        <file>components/BaseDialog.qml</file>
+        <file>components/LogTab.qml</file>
+        <file>components/TransactionDetails.qml</file>
+        <file>components/InputDialog.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="icon">images/icon.png</file>
+        <file alias="block">images/block.png</file>
+        <file alias="connected3">images/high_connection.png</file>
+        <file alias="connected2">images/medium_connection.png</file>
+        <file alias="connected1">images/low_connection.png</file>
+        <file alias="connected0">images/no_connection.png</file>
+        <file alias="warning">images/warning.png</file>
+        <file alias="locked">images/locked.png</file>
+        <file alias="unlocked">images/unlocked.png</file>
+        <file alias="gas">images/gas.png</file>
+        <file alias="all">images/all.png</file>
+    </qresource>
+</RCC>
