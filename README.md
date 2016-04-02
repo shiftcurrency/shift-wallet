@@ -6,7 +6,7 @@ Etherwall is a free software wallet/front-end for SHIFT gshift*.
 
 ## Usage
 
-SHIFT v2.1.0 is required to be running for Etherwall to work.
+SHIFT v2.4.1 is required to be running for Etherwall to work.
 
 Etherwall should auto-detect geth's IPC file/name and work "out of the box" as long as geth is running.
 
@@ -36,21 +36,10 @@ Etherwall is licensed under the GPLv3 license. See LICENSE for more info.
 
 ### Requirements
 
-gshift 1.0.2+ (eth and others might be supported)
+gshift 2.4.1+ (eth and others might be supported)
 
 Qt5.2+ with qmake
 
 ### Building
 
 qmake -config release && make
-
-### Roadmap
-
-- 1.1+ add eth support
-- 1.0 add geth account backup and restore
-- 0.9 add transaction history support [done]
-- 0.8 initial release [done]
-
-### Caveats & bugs
-
-Only supported client at the moment is gshift. Eth and others should work if you go to settings and set the IPC path/name properly.
