@@ -6,7 +6,7 @@ Etherwall is a free software wallet/front-end for SHIFT gshift*.
 
 ## Usage
 
-SHIFT v2.4.1 is required to be running for Etherwall to work.
+Gshift v2.5.0 is required to be running for Etherwall to work.
 
 Etherwall should auto-detect geth's IPC file/name and work "out of the box" as long as geth is running.
 
