@@ -1,6 +1,6 @@
 #include "clipboard.h"
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     ClipboardAdapter::ClipboardAdapter(QObject *parent) : QObject(parent) {
         fClipboard = QApplication::clipboard();

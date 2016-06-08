@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file settings.h
  * @author Ales Katona <almindor@gmail.com>
@@ -23,13 +23,14 @@
 
 #include <QSettings>
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     class Settings: public QSettings
     {
         Q_OBJECT
     public:
         Settings(QObject *parent = 0);
+        Q_INVOKABLE bool contains(const QString& key) const;
         Q_INVOKABLE QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
         Q_INVOKABLE void setValue(const QString& key, const QVariant& value);
     };

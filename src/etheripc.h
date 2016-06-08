@@ -1,25 +1,25 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file shiftipc.h
+/** @file etheripc.h
  * @author Ales Katona <almindor@gmail.com>
  * @date 2015
  *
- * SHIFT IPC client header
+ * Ethereum IPC client header
  */
 
-#ifndef SHIFTIPC_H
-#define SHIFTIPC_H
+#ifndef ETHERIPC_H
+#define ETHERIPC_H
 
 #include <QObject>
 #include <QList>
@@ -30,10 +30,13 @@
 #include <QJsonDocument>
 #include <QTimer>
 #include <QThread>
+#include <QProcess>
+#include <QTime>
 #include "types.h"
-#include "shiftlog.h"
+#include "etherlog.h"
+#include "gshiftlog.h"
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     enum RequestBurden {
         Full,
@@ -65,23 +68,36 @@ namespace Etherwall {
 
     typedef QList<RequestIPC> RequestList;
 
-    class ShiftIPC: public QObject
+    class EtherIPC: public QObject
     {
         Q_OBJECT
         Q_PROPERTY(QString error READ getError NOTIFY error)
         Q_PROPERTY(int code READ getCode NOTIFY error)
+        Q_PROPERTY(bool external READ getExternal NOTIFY externalChanged)
         Q_PROPERTY(bool busy READ getBusy NOTIFY busyChanged)
+        Q_PROPERTY(bool starting READ getStarting NOTIFY startingChanged)
+        Q_PROPERTY(bool syncing READ getSyncingVal NOTIFY syncingChanged)
+        Q_PROPERTY(bool closing READ getClosing NOTIFY closingChanged)
         Q_PROPERTY(int connectionState READ getConnectionState NOTIFY connectionStateChanged)
         Q_PROPERTY(quint64 peerCount READ peerCount NOTIFY peerCountChanged)
         Q_PROPERTY(QString clientVersion MEMBER fClientVersion NOTIFY clientVersionChanged)
+        Q_PROPERTY(quint64 currentBlock READ getCurrentBlock NOTIFY syncingChanged)
+        Q_PROPERTY(quint64 highestBlock READ getHighestBlock NOTIFY syncingChanged)
+        Q_PROPERTY(quint64 startingBlock READ getStartingBlock NOTIFY syncingChanged)
     public:
-        ShiftIPC();
+        EtherIPC(const QString& ipcPath, GshiftLog& gshiftLog);
+        virtual ~EtherIPC();
         void setWorker(QThread* worker);
         bool getBusy() const;
+        bool getExternal() const;
+        bool getStarting() const;
+        bool getClosing() const;
         const QString& getError() const;
         int getCode() const;
     public slots:
-        void connectToServer(const QString& path);
+        void init();
+        void waitConnect();
+        void connectToServer();
         void connectedToServer();
         void connectionTimeout();
         void disconnectedFromServer();
@@ -120,25 +136,38 @@ namespace Etherwall {
         void peerCountChanged(quint64 num);
         void accountChanged(const AccountInfo& info);
         void busyChanged(bool busy);
+        void externalChanged(bool external);
+        void startingChanged(bool starting);
+        void syncingChanged(bool syncing);
+        void closingChanged(bool closing);
         void connectionStateChanged();
         void clientVersionChanged(const QString& ver);
         void error();
     private:
+        QString fPath;
         QLocalSocket fSocket;
-        int fFilterID;
+        QString fFilterID;
         bool fClosingApp;
-        bool fAborted;
         quint64 fPeerCount;
         QString fReadBuffer;
         QString fError;
         int fCode;
-        QString fPath;
         AccountList fAccountList;
         TransactionList fTransactionList;
         RequestList fRequestQueue;
         RequestIPC fActiveRequest;
         QTimer fTimer;
         QString fClientVersion;
+        QProcess fGshift;
+        int fStarting;
+        GshiftLog& fGshiftLog;
+        bool fSyncing;
+        quint64 fCurrentBlock;
+        quint64 fHighestBlock;
+        quint64 fStartingBlock;
+        int fConnectAttempts;
+        QTime fKillTime;
+        bool fExternal;
 
         void handleNewAccount();
         void handleDeleteAccount();
@@ -157,14 +186,20 @@ namespace Etherwall {
         void handleGetTransactionByHash();
         void handleGetBlock();
         void handleGetClientVersion();
+        void handleGetSyncing();
 
         void onTimer();
+        bool killGshift();
         int parseVersionNum() const;
-        void getFilterChanges(int filterID);
+        void getSyncing();
+        void getFilterChanges(const QString& filterID);
         void getClientVersion();
+        bool getSyncingVal() const;
+        quint64 getCurrentBlock() const;
+        quint64 getHighestBlock() const;
+        quint64 getStartingBlock() const;
         int getConnectionState() const;
         quint64 peerCount() const;
-        void abort();
         void bail(bool soft = false);
         void setError(const QString& error);
         void errorOut();
@@ -184,5 +219,5 @@ namespace Etherwall {
 
 }
 
-#endif // SHIFTIPC_H
+#endif // ETHERIPC_H
 

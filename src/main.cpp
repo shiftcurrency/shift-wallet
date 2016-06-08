@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file main.cpp
  * @author Ales Katona <almindor@gmail.com>
@@ -22,42 +22,59 @@
 #include <QTranslator>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QtQml/qqml.h>
 #include <QIcon>
 #include <QPixmap>
 #include <QDebug>
-#include "shiftlog.h"
+#include "etherlog.h"
 #include "settings.h"
 #include "clipboard.h"
 #include "accountmodel.h"
+#include "accountproxymodel.h"
 #include "transactionmodel.h"
 #include "currencymodel.h"
+#include "gshiftlog.h"
 
-using namespace Etherwall;
+using namespace ShiftWallet;
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    QCoreApplication::setOrganizationName("Etherdiene");
-    QCoreApplication::setOrganizationDomain("SHIFT Wallet based on etherwall.com");
-    QCoreApplication::setApplicationName("Etherwall");
-    QCoreApplication::setApplicationVersion("0.9.3");
+    qmlRegisterType<AccountProxyModel>("AccountProxyModel", 0, 1, "AccountProxyModel");
+
+    QCoreApplication::setOrganizationName("Etherdyne");
+    QCoreApplication::setOrganizationDomain("shiftwallet.com");
+    QCoreApplication::setApplicationName("ShiftWallet");
+    QCoreApplication::setApplicationVersion("1.1.0");
     app.setWindowIcon(QIcon(QPixmap(":/images/icon")));
 
     QTranslator translator;
-    translator.load("i18n/SHIFT Wallet based on etherwall_" + QLocale::system().name());
+    translator.load("i18n/shiftwallet_" + QLocale::system().name());
     app.installTranslator(&translator);
 
     Settings settings;
-    ClipboardAdapter clipboard;
-    ShiftLog log;
-    ShiftIPC ipc;
 
-    const QString ipcPath = settings.value("ipc/path", DefaultIPCPath).toString();
+    bool testnet = settings.value("gshift/testnet", false).toBool();
+    const QString gshiftPath = settings.value("gshift/path", DefaultGshiftPath()).toString();
+    const QString dataPath = settings.value("gshift/datadir", DefaultDataDir).toString();
+    const QString ipcPath = DefaultIPCPath(testnet);
 
+    // set defaults
     if ( !settings.contains("ipc/path") ) {
         settings.setValue("ipc/path", ipcPath);
     }
+    if ( !settings.contains("gshift/path") ) {
+        settings.setValue("gshift/path", gshiftPath);
+    }
+    if ( !settings.contains("gshift/datadir") ) {
+        settings.setValue("gshift/datadir", dataPath);
+    }
+
+    ClipboardAdapter clipboard;
+    ShiftLog log;
+    GshiftLog gshiftLog;
+    EtherIPC ipc(ipcPath, gshiftLog);
 
     CurrencyModel currencyModel;
     AccountModel accountModel(ipc, currencyModel);
@@ -72,12 +89,13 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("currencyModel", &currencyModel);
     engine.rootContext()->setContextProperty("clipboard", &clipboard);
     engine.rootContext()->setContextProperty("log", &log);
+    engine.rootContext()->setContextProperty("gshift", &gshiftLog);
 
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 
-    log.log("Etherwall started");
-
-    ipc.connectToServer(ipcPath);
+    if ( settings.contains("program/firstrun") ) {
+        ipc.init();
+    }
 
     return app.exec();
 }

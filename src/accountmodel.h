@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file accountmodel.h
  * @author Ales Katona <almindor@gmail.com>
@@ -28,10 +28,10 @@
 #include <QJsonValue>
 #include "types.h"
 #include "currencymodel.h"
-#include "shiftipc.h"
-#include "shiftlog.h"
+#include "etheripc.h"
+#include "etherlog.h"
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     class AccountModel : public QAbstractListModel
     {
@@ -40,7 +40,7 @@ namespace Etherwall {
         Q_PROPERTY(QString selectedAccount READ getSelectedAccount NOTIFY accountSelectionChanged)
         Q_PROPERTY(QString total READ getTotal NOTIFY totalChanged)
     public:
-        AccountModel(ShiftIPC& ipc, const CurrencyModel& currencyModel);
+        AccountModel(EtherIPC& ipc, const CurrencyModel& currencyModel);
         QString getError() const;
         QHash<int, QByteArray> roleNames() const;
         int rowCount(const QModelIndex & parent = QModelIndex()) const;
@@ -52,25 +52,20 @@ namespace Etherwall {
         Q_INVOKABLE void newAccount(const QString& pw);
         Q_INVOKABLE void renameAccount(const QString& name, int index);
         Q_INVOKABLE void deleteAccount(const QString& pw, int index);
-        Q_INVOKABLE void unlockAccount(const QString& pw, int duration, int index);
-        Q_INVOKABLE bool isLocked(int index) const;
         Q_INVOKABLE const QString getAccountHash(int index) const;
     public slots:
         void connectToServerDone();
         void getAccountsDone(const AccountList& list);
         void newAccountDone(const QString& hash, int index);
         void deleteAccountDone(bool result, int index);
-        void unlockAccountDone(bool result, int index);
         void accountChanged(const AccountInfo& info);
         void newBlock(const QJsonObject& block);
-        void checkAccountLocks();
         void currencyChanged();
     signals:
         void accountSelectionChanged(int);
-        void accountLockedChanged(int);
         void totalChanged();
     private:
-        ShiftIPC& fIpc;
+        EtherIPC& fIpc;
         AccountList fAccountList;
         int fSelectedAccountRow;
         QString fSelectedAccount;

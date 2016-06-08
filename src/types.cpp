@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file types.cpp
  * @author Ales Katona <almindor@gmail.com>
@@ -23,9 +23,36 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QJsonDocument>
+#include <QApplication>
 #include <QDebug>
 
-namespace Etherwall {
+namespace ShiftWallet {
+
+    const QString DefaultIPCPath(bool testnet) {
+    #ifdef Q_OS_WIN32
+        return "\\\\.\\pipe\\gshift.ipc";
+    #else
+    #ifdef Q_OS_MACX
+        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/Ethereum/";
+    #else
+        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ethereum/";
+    #endif
+        const QString mid_fix = testnet ? "/testnet" : "";
+        return base_path + mid_fix + "/gshift.ipc";
+    #endif
+    }
+
+    const QString DefaultGshiftPath() {
+#ifdef Q_OS_WIN32
+        return QApplication::applicationDirPath() + "/gshift.exe";
+#else
+#ifdef Q_OS_MACX
+        return QApplication::applicationDirPath() + "/gshift";
+#else
+        return "/usr/bin/gshift";
+#endif
+#endif
+    }
 
 // ***************************** LogInfo ***************************** //
 
@@ -69,15 +96,17 @@ namespace Etherwall {
         return QVariant();
     }
 
-    float CurrencyInfo::recalculate(const float ether) const {
+    double CurrencyInfo::recalculate(const float ether) const {
         return ether * fPrice;
     }
 
 
 // ***************************** TransactionInfo ***************************** //
 
+    static int ACC_INDEX = 0;
+
     AccountInfo::AccountInfo(const QString& hash, const QString& balance, quint64 transCount) :
-        fHash(hash), fBalance(balance), fTransCount(transCount), fLocked(true)
+        fIndex(ACC_INDEX++), fHash(hash), fBalance(balance), fTransCount(transCount)
     {
         const QSettings settings;
 
@@ -91,9 +120,9 @@ namespace Etherwall {
         case HashRole: return QVariant(fHash);
         case BalanceRole: return QVariant(fBalance);
         case TransCountRole: return QVariant(fTransCount);
-        case LockedRole: return QVariant(isLocked());
         case SummaryRole: return QVariant(value(AliasRole).toString() + " [" + fBalance + "]");
         case AliasRole: return QVariant(fAlias.isEmpty() ? fHash : fAlias);
+        case IndexRole: return QVariant(fIndex);
         }
 
         return QVariant();
@@ -105,36 +134,6 @@ namespace Etherwall {
 
     void AccountInfo::setTransactionCount(quint64 count) {
         fTransCount = count;
-    }
-
-    void AccountInfo::unlock(qint64 toTime) {
-        if ( fHash.length() > 0 ) {
-            QSettings settings;
-            settings.setValue("accounts/" + fHash, toTime);
-            fLocked = false;
-        }
-    }
-
-    void AccountInfo::lock() {
-        fLocked = true;
-    }
-
-    bool AccountInfo::isLocked(bool internal) const {
-        if ( internal ) {
-            return fLocked;
-        }
-
-        if ( fHash.length() > 0 ) {
-            QSettings settings;
-            const qint64 toTime = settings.value("accounts/" + fHash, 0).toLongLong();
-            if ( toTime <= QDateTime::currentMSecsSinceEpoch() ) {
-                return true;
-            }
-
-            return false;
-        }
-
-        return true;
     }
 
     void AccountInfo::alias(const QString& name) {
@@ -202,7 +201,7 @@ namespace Etherwall {
         fSender = from;
         fReceiver = to;
         fNonce = 0;
-        fValue = Helpers::formatShiftStr(value);
+        fValue = Helpers::formatEtherStr(value);
         if ( !gas.isEmpty() ) {
             fGas = gas;
         }
@@ -218,9 +217,9 @@ namespace Etherwall {
         fBlockHash = source.value("blockHash").toString("invalid");
         fBlockNumber = Helpers::toQUInt64(source.value("blockNumber"));
         fTransactionIndex = Helpers::toQUInt64(source.value("transactionIndex"));
-        fValue = Helpers::toDecStrShift(source.value("value"));
+        fValue = Helpers::toDecStrEther(source.value("value"));
         fGas = Helpers::toDecStr(source.value("gas"));
-        fGasPrice = Helpers::toDecStrShift(source.value("gasPrice"));
+        fGasPrice = Helpers::toDecStrEther(source.value("gasPrice"));
         fInput = source.value("input").toString("invalid");
 
         lookupAccountAliases();
@@ -270,6 +269,7 @@ namespace Etherwall {
         return doc.toJson();
     }
 
+
 // ***************************** Helpers ***************************** //
 
     const QString Helpers::toDecStr(const QJsonValue& jv) {
@@ -280,7 +280,7 @@ namespace Etherwall {
         return decStr;
     }
 
-    const QString Helpers::toDecStrShift(const QJsonValue& jv) {
+    const QString Helpers::toDecStrEther(const QJsonValue& jv) {
         QString decStr = toDecStr(jv);
 
         int dsl = decStr.length();
@@ -332,7 +332,7 @@ namespace Etherwall {
         return QString(vinVal.toStrDec().data());
     }
 
-    const QString Helpers::weiStrToShiftStr(const QString& wei) {
+    const QString Helpers::weiStrToEtherStr(const QString& wei) {
         QString weiStr = wei;
         while ( weiStr.length() < 18 ) {
             weiStr.insert(0, '0');
@@ -349,7 +349,7 @@ namespace Etherwall {
         return BigInt::Rossi(dec.toStdString(), 10);
     }
 
-    BigInt::Rossi Helpers::shiftStrToRossi(const QString& dec) {
+    BigInt::Rossi Helpers::etherStrToRossi(const QString& dec) {
         QString decStr = dec;
 
         int diff = 18;
@@ -366,7 +366,7 @@ namespace Etherwall {
         return decStrToRossi(decStr);
     }
 
-    const QString Helpers::formatShiftStr(const QString& ether) {
+    const QString Helpers::formatEtherStr(const QString& ether) {
         QString decStr = ether;
 
         int n = decStr.indexOf('.');

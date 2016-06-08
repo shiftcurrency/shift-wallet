@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file TransactionsTab.qml
  * @author Ales Katona <almindor@gmail.com>
@@ -24,13 +24,14 @@ import QtQuick.Layouts 1.0
 
 Tab {
     id: transactionsTab
-    enabled: !ipc.busy && (ipc.connectionState > 0)
+    enabled: !ipc.busy && !ipc.starting && (ipc.connectionState > 0)
     title: qsTr("Transactions")
 
     Column {
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 15
+        anchors.margins: 0.05 * dpi
+        anchors.topMargin: 0.1 * dpi
+        spacing: 0.1 * dpi
 
         GridLayout {
             id: gridLayout
@@ -44,43 +45,16 @@ Tab {
 
             Row {
                 Layout.columnSpan: 3
-                Layout.minimumWidth: 600
-
-                PasswordDialog {
-                    id: accountUnlockDialog
-                    //standardButtons: StandardButton.Ok | StandardButton.Cancel
-
-                    onAccepted: {
-                        accountModel.unlockAccount(password, settings.value("ipc/accounts/lockduration", 300), fromField.currentIndex)
-                    }
-                }
-
-                ToolButton {
-                    id: lockTool
-                    iconSource: accountModel.isLocked(fromField.currentIndex) ? "/images/locked" : "/images/unlocked"
-                    width: 24
-                    height: 24
-
-                    Connections {
-                        target: accountModel
-                        onAccountLockedChanged: {
-                            lockTool.iconSource = accountModel.isLocked(fromField.currentIndex) ? "/images/locked" : "/images/unlocked"
-                            transactionWarning.refresh()
-                        }
-                    }
-
-                    onClicked: {
-                        accountModel.selectedAccountRow = fromField.currentIndex
-                        accountUnlockDialog.openFocused("Unlock " + accountModel.selectedAccount)
-                    }
-                }
+                Layout.minimumWidth: 6 * dpi
 
                 ComboBox {
                     id: fromField
-                    width: parent.width - lockTool.width
+                    width: parent.width
                     model: accountModel
                     textRole: "summary"
-                    onCurrentIndexChanged: transactionWarning.refresh()
+                    onCurrentIndexChanged: {
+                        transactionWarning.refresh()
+                    }
                 }
             }
 
@@ -96,7 +70,7 @@ Tab {
                 }
 
                 maximumLength: 42
-                Layout.minimumWidth: 600
+                Layout.minimumWidth: 6 * dpi
                 Layout.columnSpan: 3
 
                 onTextChanged: transactionWarning.refresh()
@@ -127,11 +101,6 @@ Tab {
 
                         if ( !result.from.match(/0x[a-f,0-9]{40}/) ) {
                             result.error = qsTr("Sender account invalid")
-                            return result
-                        }
-
-                        if ( accountModel.isLocked(index) ) {
-                            result.error = qsTr("From account is locked")
                             return result
                         }
 
@@ -172,11 +141,11 @@ Tab {
                     }
                 }
 
-                ConfirmDialog {
-                    id: confirmDialog
-                    msg: qsTr("Confirm transaction send?")
+                PasswordDialog {
+                    id: transactionSendDialog
+                    title: qsTr("Confirm transaction")
 
-                    onYes: {
+                    onAccepted: {
                         var result = transactionWarning.check()
                         if ( result.error !== null ) {
                             errorDialog.msg = result.error
@@ -184,12 +153,13 @@ Tab {
                             return
                         }
 
-                        transactionModel.sendTransaction(result.from, result.to, result.txtVal, result.txtGas)
+                        transactionModel.sendTransaction(password, result.from, result.to, result.txtVal, result.txtGas)
                     }
                 }
 
                 Button {
                     id: sendButton
+                    enabled: !ipc.syncing && !ipc.closing && !ipc.starting
                     text: "Send"
 
                     onClicked: {
@@ -200,7 +170,8 @@ Tab {
                             return
                         }
 
-                        confirmDialog.open()
+                        transactionSendDialog.msg = qsTr("Confirm send of Ξ") + result.value + qsTr(" to: ") + result.to
+                        transactionSendDialog.open()
                     }
                 }
             }
@@ -221,7 +192,7 @@ Tab {
                     }
 
                     maximumLength: 50
-                    width: 200
+                    width: 2 * dpi
                     onTextChanged: transactionWarning.refresh()
                 }
 
@@ -236,10 +207,10 @@ Tab {
                 }
             }
 
-            // -- estimate is broken in geth 1.0.1- must wait for later release
+            // -- estimate is broken in gshift 1.0.1- must wait for later release
             Row {
                 Layout.columnSpan: 2
-                Layout.minimumWidth: 450
+                Layout.minimumWidth: 4.5 * dpi
 
                 Label {
                     text: qsTr("Gas: ")
@@ -267,7 +238,7 @@ Tab {
                     id: valueTotalField
                     readOnly: true
                     maximumLength: 50
-                    width: 200
+                    width: 2 * dpi
                     validator: DoubleValidator {
                         bottom: 0.000000000000000001 // should be 1 wei
                         decimals: 18
@@ -294,29 +265,28 @@ Tab {
                 horizontalAlignment: Text.AlignRight
                 role: "blocknumber"
                 title: qsTr("Block#")
-                width: 70
+                width: 0.75 * dpi
             }
             TableViewColumn {
                 role: "senderalias"
                 title: qsTr("Sender")
-                width: 200
+                width: 2.25 * dpi
             }
             TableViewColumn {
                 role: "receiveralias"
                 title: qsTr("Receiver")
-                width: 200
+                width: 2.25 * dpi
             }
             TableViewColumn {
                 horizontalAlignment: Text.AlignRight
                 role: "value"
                 title: qsTr("Value (Shift)")
-                width: 150
+                width: 1.4 * dpi
             }
             TableViewColumn {
-                horizontalAlignment: Text.AlignRight
                 role: "depth"
                 title: qsTr("Depth")
-                width: 70
+                width: 0.75 * dpi
             }
             model: transactionModel
 
@@ -327,6 +297,13 @@ Tab {
                     text: qsTr("Details")
                     onTriggered: {
                         details.open(transactionModel.getJson(transactionView.currentRow, true))
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Copy Transaction Hash")
+                    onTriggered: {
+                        clipboard.setText(transactionModel.getHash(transactionView.currentRow))
                     }
                 }
 
@@ -343,6 +320,14 @@ Tab {
                         clipboard.setText(transactionModel.getReceiver(transactionView.currentRow))
                     }
                 }
+
+                MenuItem {
+                    text: qsTr("Resend")
+                    onTriggered: {
+                        toField.text = transactionModel.getReceiver(transactionView.currentRow)
+                        valueField.text = transactionModel.getValue(transactionView.currentRow)
+                    }
+                }
             }
 
             rowDelegate: Item {
@@ -350,6 +335,8 @@ Tab {
                     id: osPalette
                     colorGroup: SystemPalette.Active
                 }
+
+                height: 0.2 * dpi
 
                 Rectangle {
                     anchors {

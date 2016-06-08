@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file AccountsTab.qml
  * @author Ales Katona <almindor@gmail.com>
@@ -21,16 +21,18 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
+import AccountProxyModel 0.1
 
 Tab {
     id: accountsTab
-    enabled: !ipc.busy && (ipc.connectionState > 0)
+    enabled: !ipc.busy && !ipc.starting && (ipc.connectionState > 0)
     title: qsTr("Accounts")
     property bool show_hashes: false
 
     Column {
         id: col
-        anchors.margins: 20
+        anchors.margins: 0.05 * dpi
+        anchors.topMargin: 0.1 * dpi
         anchors.fill: parent
 
         Item {
@@ -42,6 +44,7 @@ Tab {
                 id: newAccountButton
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
+                enabled: !ipc.syncing && !ipc.closing && !ipc.starting
                 text: qsTr("New account")
                 onClicked: {
                     accountNewDialog.openFocused("New account password")
@@ -51,7 +54,7 @@ Tab {
             CheckBox {
                 id: showHashButton
                 anchors.left: newAccountButton.right
-                anchors.leftMargin: 5
+                anchors.leftMargin: 0.01 * dpi
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Show Hashes")
                 onClicked: {
@@ -61,7 +64,7 @@ Tab {
 
             Label {
                 id: currencyLabel
-                anchors.rightMargin: 5
+                anchors.rightMargin: 0.01 * dpi
                 anchors.right: currencyCombo.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr("Currency")
@@ -69,9 +72,9 @@ Tab {
 
             ComboBox {
                 id: currencyCombo
-                width: 70
+                width: 1 * dpi
                 anchors.right: totalLabel.left
-                anchors.rightMargin: 5
+                anchors.rightMargin: 0.01 * dpi
                 anchors.verticalCenter: parent.verticalCenter
                 height: newAccountButton.height
                 model: currencyModel
@@ -85,25 +88,23 @@ Tab {
                 id: totalLabel
                 anchors.right: totalField.left
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 5
-                text: qsTr("Wallet total ")
+                anchors.rightMargin: 0.01 * dpi
+                text: qsTr("Wallet total: ")
             }
 
             TextField {
                 id: totalField
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                height: newAccountButton.height
-                width: 210
+                width: 1 * dpi
                 horizontalAlignment: TextInput.AlignRight
                 readOnly: true
-                text: accountModel.total
+                text: Number(accountModel.total).toFixed(2)
             }
         }
 
-        PasswordDialog {
+        AccountDialog {
             id: accountNewDialog
-            acceptEmpty: false
 
             onAccepted: {
                 accountModel.newAccount(password)
@@ -130,15 +131,6 @@ Tab {
             }
         }
 
-        PasswordDialog {
-            id: accountUnlockDialog
-            //standardButtons: StandardButton.Ok | StandardButton.Cancel
-
-            onAccepted: {
-                accountModel.unlockAccount(password, settings.value("ipc/accounts/lockduration", 300), accountView.currentRow)
-            }
-        }
-
         TableView {
             id: accountView
             anchors.left: parent.left
@@ -146,39 +138,44 @@ Tab {
             height: parent.height - newAccountButton.height - parent.spacing
 
             TableViewColumn {
-                horizontalAlignment: Text.AlignHCenter
-                role: "locked"
-                title: qsTr("Locked")
-                width: 70
-                delegate: ToolButton {
-                    iconSource: (styleData.value === true) ? "/images/locked" : "/images/unlocked"
-                    enabled: (styleData.value === true)
-                    onClicked: {
-                        if ( styleData.value === true ) {
-                            accountView.currentRow = styleData.row
-                            accountModel.selectedAccountRow = accountView.currentRow
-                            accountUnlockDialog.openFocused("Unlock " + accountModel.selectedAccount)
-                        }
-                    }
-                }
+                role: "index"
+                title: qsTr("#")
+                width: 0.3 * dpi
             }
+
             TableViewColumn {
                 role: show_hashes ? "hash" : "alias"
                 title: qsTr("Account")
-                width: 400
+                width: 4 * dpi
             }
+
             TableViewColumn {
                 horizontalAlignment: Text.AlignRight
                 role: "balance"
                 title: qsTr("Balance ") + "(" + currencyModel.currencyName + ")"
-                width: 150
+                width: 2.5 * dpi
             }
             TableViewColumn {
                 horizontalAlignment: Text.AlignRight
                 role: "transactions"
                 title: qsTr("Sent Trans.")
-                width: 100
+                width: 1 * dpi
             }
+
+            // TODO: fix selection for active row first
+            /*sortIndicatorVisible: true
+            model: AccountProxyModel {
+                   id: proxyModel
+                   source: accountModel
+
+                   sortOrder: accountView.sortIndicatorOrder
+                   sortCaseSensitivity: Qt.CaseInsensitive
+                   sortRole: accountView.getColumn(accountView.sortIndicatorColumn).role
+
+                   filterString: "*"
+                   filterSyntax: AccountProxyModel.Wildcard
+                   filterCaseSensitivity: Qt.CaseInsensitive
+               }*/
             model: accountModel
 
             Menu {
@@ -211,6 +208,8 @@ Tab {
                     id: osPalette
                     colorGroup: SystemPalette.Active
                 }
+
+                height: 0.3 * dpi
 
                 Rectangle {
                     anchors {

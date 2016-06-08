@@ -8,13 +8,15 @@ DEPENDPATH += src
 SOURCES += src/main.cpp \
     src/accountmodel.cpp \
     src/types.cpp \
-    src/shiftipc.cpp \
+    src/etheripc.cpp \
     src/settings.cpp \
     src/bigint.cpp \
     src/transactionmodel.cpp \
     src/clipboard.cpp \
-    src/shiftlog.cpp \
-    src/currencymodel.cpp
+    src/etherlog.cpp \
+    src/currencymodel.cpp \
+    src/accountproxymodel.cpp \
+    src/gshiftlog.cpp
 
 RESOURCES += qml/qml.qrc
 
@@ -25,7 +27,7 @@ QML_IMPORT_PATH = qml
 include(deployment.pri)
 
 TRANSLATIONS += \
-    i18n/etherwall.ts
+    i18n/shiftwallet.ts
 
 lupdate_only {
     SOURCES += \
@@ -36,13 +38,15 @@ lupdate_only {
 HEADERS += \
     src/accountmodel.h \
     src/types.h \
-    src/shiftipc.h \
+    src/etheripc.h \
     src/settings.h \
     src/bigint.h \
     src/transactionmodel.h \
     src/clipboard.h \
-    src/shiftlog.h \
-    src/currencymodel.h
+    src/etherlog.h \
+    src/currencymodel.h \
+    src/accountproxymodel.h \
+    src/gshiftlog.h
 
 macx {
     ICON=qml/images/icon.icns

@@ -11,25 +11,31 @@
     You should have received a copy of the GNU General Public License
     along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file SettingsTab.qml
+/** @file AccountsTab.qml
  * @author Ales Katona <almindor@gmail.com>
  * @date 2015
  *
- * Settings tab
+ * Log tab
  */
 
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 
 Tab {
-    id: settingsTab
-    title: qsTr("Settings")
+    title: qsTr("Gshift")
 
-    SettingsContent {
-        id: settingsContent
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 0.05 * dpi
-        anchors.topMargin: 0.1 * dpi
+    ScrollView {
+        ListView {
+            anchors.margins: 0.2 * dpi
+            anchors.fill: parent
+            model: gshift
+
+            delegate: Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: msg
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            }
+        }
     }
 }

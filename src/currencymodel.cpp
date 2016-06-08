@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file currencymodel.h
  * @author Ales Katona <almindor@gmail.com>
@@ -25,7 +25,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     CurrencyModel::CurrencyModel() : QAbstractListModel(0), fIndex(0), fTimer()
     {
@@ -52,23 +52,37 @@ namespace Etherwall {
         return QVariant(fCurrencies.at(index.row()).value(role));
     }
 
-    QString CurrencyModel::getCurrencyName() const {
-        return fCurrencies.at(fIndex).value(NameRole).toString();
+    QString CurrencyModel::getCurrencyName(int index) const {
+        if ( index < 0 ) {
+            index = fIndex;
+        }
+
+        if ( fCurrencies.size() > index && index >= 0 ) {
+            return fCurrencies.at(index).value(NameRole).toString();
+        }
+
+        return "UNK";
     }
 
     QVariant CurrencyModel::recalculate(const QVariant ether) const {
         if ( fIndex == 0 ) {
             return ether; // no change
         }
-        return QVariant(fCurrencies.at(fIndex).recalculate(ether.toFloat()));
+
+        double val = fCurrencies.at(fIndex).recalculate(ether.toDouble());
+        return QVariant(QString::number(val, 'f', 18));
+    }
+
+    int CurrencyModel::getCount() const {
+        return fCurrencies.size();
     }
 
     void CurrencyModel::loadCurrencies() {
         fCurrencies.clear();
-        fCurrencies.append(CurrencyInfo("SHIFT", 1.0));
+        fCurrencies.append(CurrencyInfo("ETH", 1.0));
 
         // get currency data from etherdata
-        QNetworkRequest request(QUrl("http://data.SHIFT Wallet based on etherwall.com/api/currencies"));
+        QNetworkRequest request(QUrl("http://data.shiftwallet.com/api/currencies"));
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
         QJsonObject objectJson;
@@ -133,6 +147,14 @@ namespace Etherwall {
 
     int CurrencyModel::getCurrencyIndex() const {
         return fIndex;
+    }
+
+    double CurrencyModel::getCurrencyPrice(int index) const {
+        if ( fCurrencies.size() > index && index >= 0 ) {
+            return fCurrencies.at(index).recalculate(1.0);
+        }
+
+        return 1.0;
     }
 
 }

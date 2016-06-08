@@ -1,22 +1,19 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file types.h
  * @author Ales Katona <almindor@gmail.com>
  * @date 2015
- * 
- * @author Joey. Core dev for SHIFT <shiftcurrency@gmail.com>. Only responsible for rebrand.
- * @date 2016-03
  *
  * Types header
  */
@@ -34,17 +31,23 @@
 #include <QDateTime>
 #include "bigint.h"
 
-namespace Etherwall {
+namespace ShiftWallet {
 
 #ifdef Q_OS_WIN32
-    static const QString DefaultIPCPath = "\\\\.\\pipe\\gshift.ipc";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Ethereum";
 #else
     #ifdef Q_OS_MACX
-    static const QString DefaultIPCPath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/gshift/gshift.ipc";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/Ethereum";
     #else
-    static const QString DefaultIPCPath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.gshift/gshift.ipc";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ethereum";
     #endif
 #endif
+
+    static const quint64 SYNC_DEPTH = 10;
+    static const QString DefaultGshiftArgs = "--fast --cache 512";
+
+    const QString DefaultIPCPath(bool testnet);
+    const QString DefaultGshiftPath();
 
     enum LogRoles {
         MsgRole = Qt::UserRole + 1,
@@ -84,7 +87,7 @@ namespace Etherwall {
     public:
         CurrencyInfo( const QString name, const float price );
         const QVariant value(const int role) const;
-        float recalculate(const float shift) const;
+        double recalculate(const float ether) const;
     private:
         QString fName;
         float fPrice;
@@ -110,16 +113,17 @@ namespace Etherwall {
         UninstallFilter,
         GetTransactionByHash,
         GetBlock,
-        GetClientVersion
+        GetClientVersion,
+        GetSyncing
     };
 
     enum AccountRoles {
-        LockedRole = Qt::UserRole + 1,
-        HashRole,
+        HashRole = Qt::UserRole + 1,
         BalanceRole,
         TransCountRole,
         SummaryRole,
-        AliasRole
+        AliasRole,
+        IndexRole
     };
 
     class AccountInfo
@@ -131,12 +135,13 @@ namespace Etherwall {
         void setBalance(const QString& balance);
         void setTransactionCount(quint64 count);
         void lock();
-        void unlock(qint64 toTime);
-        bool isLocked(bool internal = false) const;
+        void unlock();
+        bool isLocked() const;
         void alias(const QString& name);
     private:
+        int fIndex;
         QString fHash;
-        QString fBalance; // in shift
+        QString fBalance; // in ether
         quint64 fTransCount;
         QString fAlias;
         bool fLocked;
@@ -183,7 +188,7 @@ namespace Etherwall {
         quint64 fNonce;
         QString fSender;
         QString fReceiver;
-        QString fValue; // in shift
+        QString fValue; // in ether
         quint64 fBlockNumber;
         QString fBlockHash;
         quint64 fTransactionIndex;
@@ -199,16 +204,16 @@ namespace Etherwall {
     class Helpers {
     public:
         static const QString toDecStr(const QJsonValue &jv);
-        static const QString toDecStrShift(const QJsonValue &jv);
+        static const QString toDecStrEther(const QJsonValue &jv);
         static const QString toDecStr(quint64 val);
         static const QString toHexStr(quint64 val);
         static const QString toHexWeiStr(const QString& val);
         static const QString toHexWeiStr(quint64 val);
         static const QString decStrToHexStr(const QString& dec);
-        static const QString weiStrToShiftStr(const QString& wei);
+        static const QString weiStrToEtherStr(const QString& wei);
         static BigInt::Rossi decStrToRossi(const QString& dec);
-        static BigInt::Rossi shiftStrToRossi(const QString& dec);
-        static const QString formatShiftStr(const QString& shift);
+        static BigInt::Rossi etherStrToRossi(const QString& dec);
+        static const QString formatEtherStr(const QString& ether);
         static const QJsonArray toQJsonArray(const AccountList& list);
         static quint64 toQUInt64(const QJsonValue& jv);
     };

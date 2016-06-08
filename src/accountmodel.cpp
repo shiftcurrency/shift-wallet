@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file accountmodel.cpp
  * @author Ales Katona <almindor@gmail.com>
@@ -24,18 +24,17 @@
 #include <QSettings>
 #include <QDateTime>
 
-namespace Etherwall {
+namespace ShiftWallet {
 
-    AccountModel::AccountModel(ShiftIPC& ipc, const CurrencyModel& currencyModel) :
+    AccountModel::AccountModel(EtherIPC& ipc, const CurrencyModel& currencyModel) :
         QAbstractListModel(0), fIpc(ipc), fAccountList(), fSelectedAccountRow(-1), fCurrencyModel(currencyModel)
     {
-        connect(&ipc, &ShiftIPC::connectToServerDone, this, &AccountModel::connectToServerDone);
-        connect(&ipc, &ShiftIPC::getAccountsDone, this, &AccountModel::getAccountsDone);
-        connect(&ipc, &ShiftIPC::newAccountDone, this, &AccountModel::newAccountDone);
-        connect(&ipc, &ShiftIPC::deleteAccountDone, this, &AccountModel::deleteAccountDone);
-        connect(&ipc, &ShiftIPC::unlockAccountDone, this, &AccountModel::unlockAccountDone);
-        connect(&ipc, &ShiftIPC::accountChanged, this, &AccountModel::accountChanged);
-        connect(&ipc, &ShiftIPC::newBlock, this, &AccountModel::newBlock);
+        connect(&ipc, &EtherIPC::connectToServerDone, this, &AccountModel::connectToServerDone);
+        connect(&ipc, &EtherIPC::getAccountsDone, this, &AccountModel::getAccountsDone);
+        connect(&ipc, &EtherIPC::newAccountDone, this, &AccountModel::newAccountDone);
+        connect(&ipc, &EtherIPC::deleteAccountDone, this, &AccountModel::deleteAccountDone);
+        connect(&ipc, &EtherIPC::accountChanged, this, &AccountModel::accountChanged);
+        connect(&ipc, &EtherIPC::newBlock, this, &AccountModel::newBlock);
 
         connect(&currencyModel, &CurrencyModel::currencyChanged, this, &AccountModel::currencyChanged);
     }
@@ -45,9 +44,10 @@ namespace Etherwall {
         roles[HashRole] = "hash";
         roles[BalanceRole] = "balance";
         roles[TransCountRole] = "transactions";
-        roles[LockedRole] = "locked";
         roles[SummaryRole] = "summary";
         roles[AliasRole] = "alias";
+        roles[IndexRole] = "index";
+
         return roles;
     }
 
@@ -90,12 +90,14 @@ namespace Etherwall {
         BigInt::Rossi total;
 
         foreach ( const AccountInfo& info, fAccountList ) {
-            const QString strVal = fCurrencyModel.recalculate(info.value(BalanceRole)).toString();
-            total += Helpers::shiftStrToRossi(strVal);
+            const QVariant balance = info.value(BalanceRole);
+            double dVal = fCurrencyModel.recalculate(balance).toDouble();
+            const QString strVal = QString::number(dVal, 'f', 18);
+            total += Helpers::etherStrToRossi(strVal);
         }
 
         const QString weiStr = QString(total.toStrDec().data());
-        return Helpers::weiStrToShiftStr(weiStr);
+        return Helpers::weiStrToEtherStr(weiStr);
     }
 
     void AccountModel::newAccount(const QString& pw) {
@@ -125,23 +127,6 @@ namespace Etherwall {
         } else {
             ShiftLog::logMsg("Invalid account selection for delete", LS_Error);
         }
-    }
-
-    void AccountModel::unlockAccount(const QString& pw, int duration, int index) {
-        if ( index >= 0 && index < fAccountList.size() && duration > 0 ) {
-            const QString hash = fAccountList.at(index).value(HashRole).toString();
-            fIpc.unlockAccount(hash, pw, duration, index);
-        } else {
-            ShiftLog::logMsg("Invalid account selection for unlock");
-        }
-    }
-
-    bool AccountModel::isLocked(int index) const {
-        if ( index < 0 || index >= fAccountList.length() ) {
-            return true;
-        }
-
-        return fAccountList.at(index).isLocked();
     }
 
     const QString AccountModel::getAccountHash(int index) const {
@@ -175,36 +160,6 @@ namespace Etherwall {
             ShiftLog::logMsg("Account deleted");
         } else {
             ShiftLog::logMsg("Account delete failure");
-        }
-    }
-
-    void AccountModel::unlockAccountDone(bool result, int index) {
-        if ( result ) {
-            QSettings settings;
-            qint64 diff = settings.value("/ipc/accounts/lockduration", 300).toInt() * 1000;
-
-            QTimer::singleShot(diff + 200, this, SLOT(checkAccountLocks()));
-            fAccountList[index].unlock(QDateTime::currentMSecsSinceEpoch() + diff);
-            const QModelIndex& modelIndex = QAbstractListModel::createIndex(index, 0);
-            emit dataChanged(modelIndex, modelIndex, QVector<int>(1, LockedRole));
-            emit accountLockedChanged(index);
-
-            ShiftLog::logMsg("Account unlocked");
-        } else {
-            ShiftLog::logMsg("Account unlock failure");
-        }
-    }
-
-    void AccountModel::checkAccountLocks() {
-        int index = 0;
-        foreach ( AccountInfo i, fAccountList ) {
-            if ( i.value(LockedRole).toBool() != i.isLocked(true) ) {
-                i.lock();
-                const QModelIndex& modelIndex = QAbstractListModel::createIndex(index, 0);
-                emit dataChanged(modelIndex, modelIndex, QVector<int>(1, LockedRole));
-                emit accountLockedChanged(index);
-            }
-            index++;
         }
     }
 

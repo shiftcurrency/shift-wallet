@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file AccountsTab.qml
  * @author Ales Katona <almindor@gmail.com>
@@ -27,7 +27,7 @@ Tab {
 
     Column {
         id: col
-        anchors.margins: 20
+        anchors.margins: 0.2 * dpi
         anchors.fill: parent
 
         Row {
@@ -61,50 +61,21 @@ Tab {
             }
         }
 
-        TableView {
-            id: logView
+        ScrollView {
             anchors.left: parent.left
             anchors.right: parent.right
-            height: parent.height - parent.spacing - logControlRow.height
+            height: parent.height - logControlRow.height
 
-            TableViewColumn {
-                role: "date"
-                title: qsTr("Date")
-                width: 200
-            }
-            TableViewColumn {
-                role: "severity"
-                title: qsTr("Severity")
-                width: 100
-            }
-            TableViewColumn {
-                role: "msg"
-                title: qsTr("Message")
-                width: 600
-            }
-            model: log
+            ListView {
+                anchors.fill: parent
+                model: log
 
-            rowDelegate: Item {
-                height: 70
-                SystemPalette {
-                    id: osPalette
-                    colorGroup: SystemPalette.Active
+                delegate: Text {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    text: date + "\t" + severity + "\t" + msg
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 }
-
-                Rectangle {
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        verticalCenter: parent.verticalCenter
-                    }
-                    height: parent.height
-                    color: styleData.selected ? osPalette.highlight : (styleData.alternate ? osPalette.alternateBase : osPalette.base)
-                }
-            }
-
-            itemDelegate: TextArea {
-                readOnly: true
-                text: styleData.value
             }
         }
     }

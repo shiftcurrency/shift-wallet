@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file transactionmodel.h
  * @author Ales Katona <almindor@gmail.com>
@@ -28,20 +28,22 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include "types.h"
-#include "shiftipc.h"
+#include "etheripc.h"
 #include "accountmodel.h"
-#include "shiftlog.h"
+#include "etherlog.h"
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     class TransactionModel : public QAbstractListModel
     {
         Q_OBJECT
+        Q_PROPERTY(quint64 firstBlock READ getFirstBlock NOTIFY blockNumberChanged)
+        Q_PROPERTY(quint64 lastBlock READ getLastBlock NOTIFY blockNumberChanged)
         Q_PROPERTY(quint64 blockNumber READ getBlockNumber NOTIFY blockNumberChanged FINAL)
         Q_PROPERTY(QString gasPrice READ getGasPrice NOTIFY gasPriceChanged FINAL)
         Q_PROPERTY(QString gasEstimate READ getGasEstimate NOTIFY gasEstimateChanged FINAL)
     public:
-        TransactionModel(ShiftIPC& ipc, const AccountModel& accountModel);
+        TransactionModel(EtherIPC& ipc, const AccountModel& accountModel);
         quint64 getBlockNumber() const;
         const QString& getGasPrice() const;
         const QString& getGasEstimate() const;
@@ -51,12 +53,16 @@ namespace Etherwall {
         int containsTransaction(const QString& hash);
         Q_INVOKABLE const QString estimateTotal(const QString& value, const QString& gas) const;
         Q_INVOKABLE void loadHistory();
+        Q_INVOKABLE const QString getHash(int index) const;
         Q_INVOKABLE const QString getSender(int index) const;
         Q_INVOKABLE const QString getReceiver(int index) const;
+        Q_INVOKABLE double getValue(int index) const;
         Q_INVOKABLE const QJsonObject getJson(int index, bool decimal) const;
         Q_INVOKABLE const QString getMaxValue(int row, const QString& gas) const;
         Q_INVOKABLE void lookupAccountsAliases();
         double getHistoryProgress() const;
+        quint64 getFirstBlock() const;
+        quint64 getLastBlock() const;
     public slots:
         void connectToServerDone();
         void getAccountsDone(const AccountList& list);
@@ -64,21 +70,23 @@ namespace Etherwall {
         void getGasPriceDone(const QString& num);
         void estimateGasDone(const QString& num);
         void sendTransactionDone(const QString& hash);
-        void sendTransaction(const QString& from, const QString& to, const QString& value, const QString& gas = QString());
+        void sendTransaction(const QString& password, const QString& from, const QString& to, const QString& value, const QString& gas = QString());
         void newTransaction(const TransactionInfo& info);
         void newBlock(const QJsonObject& block);
         void refresh();
-        void loadHistoryDone(QNetworkReply* reply);
+        void loadRequestDone(QNetworkReply* reply);
     signals:
         void blockNumberChanged(quint64 num);
         void gasPriceChanged(const QString& price);
         void gasEstimateChanged(const QString& price);
         void historyChanged();
     private:
-        ShiftIPC& fIpc;
+        EtherIPC& fIpc;
         const AccountModel& fAccountModel;
         TransactionList fTransactionList;
         quint64 fBlockNumber;
+        quint64 fLastBlock;
+        quint64 fFirstBlock;
         QString fGasPrice;
         QString fGasEstimate;
         TransactionInfo fQueuedTransaction;

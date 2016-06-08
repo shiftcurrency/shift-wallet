@@ -1,15 +1,15 @@
 /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
 /** @file transactionmodel.cpp
  * @author Ales Katona <almindor@gmail.com>
@@ -20,31 +20,40 @@
 
 #include "transactionmodel.h"
 #include <QDebug>
+#include <QTimer>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QSettings>
 
-namespace Etherwall {
+namespace ShiftWallet {
 
-    TransactionModel::TransactionModel(ShiftIPC& ipc, const AccountModel& accountModel) :
-        QAbstractListModel(0), fIpc(ipc), fAccountModel(accountModel), fBlockNumber(0), fGasPrice("unknown"), fGasEstimate("unknown"), fNetManager(this)
+    TransactionModel::TransactionModel(EtherIPC& ipc, const AccountModel& accountModel) :
+        QAbstractListModel(0), fIpc(ipc), fAccountModel(accountModel), fBlockNumber(0), fLastBlock(0), fFirstBlock(0), fGasPrice("unknown"), fGasEstimate("unknown"), fNetManager(this)
     {
-        connect(&ipc, &ShiftIPC::connectToServerDone, this, &TransactionModel::connectToServerDone);
-        connect(&ipc, &ShiftIPC::getAccountsDone, this, &TransactionModel::getAccountsDone);
-        connect(&ipc, &ShiftIPC::getBlockNumberDone, this, &TransactionModel::getBlockNumberDone);
-        connect(&ipc, &ShiftIPC::getGasPriceDone, this, &TransactionModel::getGasPriceDone);
-        connect(&ipc, &ShiftIPC::estimateGasDone, this, &TransactionModel::estimateGasDone);
-        connect(&ipc, &ShiftIPC::sendTransactionDone, this, &TransactionModel::sendTransactionDone);
-        connect(&ipc, &ShiftIPC::newTransaction, this, &TransactionModel::newTransaction);
-        connect(&ipc, &ShiftIPC::newBlock, this, &TransactionModel::newBlock);
+        connect(&ipc, &EtherIPC::connectToServerDone, this, &TransactionModel::connectToServerDone);
+        connect(&ipc, &EtherIPC::getAccountsDone, this, &TransactionModel::getAccountsDone);
+        connect(&ipc, &EtherIPC::getBlockNumberDone, this, &TransactionModel::getBlockNumberDone);
+        connect(&ipc, &EtherIPC::getGasPriceDone, this, &TransactionModel::getGasPriceDone);
+        connect(&ipc, &EtherIPC::estimateGasDone, this, &TransactionModel::estimateGasDone);
+        connect(&ipc, &EtherIPC::sendTransactionDone, this, &TransactionModel::sendTransactionDone);
+        connect(&ipc, &EtherIPC::newTransaction, this, &TransactionModel::newTransaction);
+        connect(&ipc, &EtherIPC::newBlock, this, &TransactionModel::newBlock);
 
-        connect(&fNetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(loadHistoryDone(QNetworkReply*)));
+        connect(&fNetManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(loadRequestDone(QNetworkReply*)));
     }
 
     quint64 TransactionModel::getBlockNumber() const {
         return fBlockNumber;
+    }
+
+    quint64 TransactionModel::getFirstBlock() const {
+        return fFirstBlock;
+    }
+
+    quint64 TransactionModel::getLastBlock() const {
+        return fLastBlock;
     }
 
     const QString& TransactionModel::getGasPrice() const {
@@ -124,6 +133,10 @@ namespace Etherwall {
         }
 
         fBlockNumber = num;
+        if ( fFirstBlock == 0 ) {
+            fFirstBlock = num;
+        }
+
         emit blockNumberChanged(num);
 
         if ( !fTransactionList.isEmpty() ) { // depth changed for all
@@ -143,7 +156,8 @@ namespace Etherwall {
         emit gasEstimateChanged(num);
     }
 
-    void TransactionModel::sendTransaction(const QString& from, const QString& to, const QString& value, const QString& gas) {
+    void TransactionModel::sendTransaction(const QString& password, const QString& from, const QString& to, const QString& value, const QString& gas) {
+        fIpc.unlockAccount(from, password, 5, 0);
         fIpc.sendTransaction(from, to, value, gas);
         fQueuedTransaction.init(from, to, value, gas);
     }
@@ -238,6 +252,10 @@ namespace Etherwall {
         settings.endGroup();
     }
 
+    bool transCompare(const TransactionInfo& a, const TransactionInfo& b) {
+        return a.getBlockNumber() > b.getBlockNumber();
+    }
+
     void TransactionModel::refresh() {
         QSettings settings;
         settings.beginGroup("transactions");
@@ -255,7 +273,7 @@ namespace Etherwall {
                     const TransactionInfo info(jsonDoc.object());
                     newTransaction(info);
                     // if transaction is newer than 1 day restore it from gshift anyhow to ensure correctness in case of reorg
-                    if ( fBlockNumber - info.getBlockNumber() < 5400 ) {
+                    if ( info.getBlockNumber() == 0 || fBlockNumber - info.getBlockNumber() < 5400 ) {
                         fIpc.getTransactionByHash(info.getHash());
                     }
                 }
@@ -265,12 +283,14 @@ namespace Etherwall {
             }
         }
         settings.endGroup();
+
+        qSort(fTransactionList.begin(), fTransactionList.end(), transCompare);
     }
 
     const QString TransactionModel::estimateTotal(const QString& value, const QString& gas) const {
-        BigInt::Rossi valRossi = Helpers::shiftStrToRossi(value);
+        BigInt::Rossi valRossi = Helpers::etherStrToRossi(value);
         BigInt::Rossi valGas = Helpers::decStrToRossi(gas);
-        BigInt::Rossi valGasPrice = Helpers::shiftStrToRossi(fGasPrice);
+        BigInt::Rossi valGasPrice = Helpers::etherStrToRossi(fGasPrice);
 
         if ( valRossi == BigInt::Rossi(0) ) {
             return "0";
@@ -278,7 +298,15 @@ namespace Etherwall {
 
         const QString wei = QString((valRossi + valGas * valGasPrice).toStrDec().data());
 
-        return Helpers::weiStrToShiftStr(wei);
+        return Helpers::weiStrToEtherStr(wei);
+    }
+
+    const QString TransactionModel::getHash(int index) const {
+        if ( index >= 0 && index < fTransactionList.length() ) {
+            return fTransactionList.at(index).value(THashRole).toString();
+        }
+
+        return QString();
     }
 
     const QString TransactionModel::getSender(int index) const {
@@ -297,6 +325,14 @@ namespace Etherwall {
         return QString();
     }
 
+    double TransactionModel::getValue(int index) const {
+        if ( index >= 0 && index < fTransactionList.length() ) {
+            return fTransactionList.at(index).value(ValueRole).toFloat();
+        }
+
+        return 0;
+    }
+
     const QJsonObject TransactionModel::getJson(int index, bool decimal) const {
         if ( index < 0 || index >= fTransactionList.length() ) {
             return QJsonObject();
@@ -308,9 +344,9 @@ namespace Etherwall {
     const QString TransactionModel::getMaxValue(int row, const QString& gas) const {
         const QModelIndex index = QAbstractListModel::createIndex(row, 2);
 
-        BigInt::Rossi balanceWeiRossi = Helpers::shiftStrToRossi( fAccountModel.data(index, BalanceRole).toString() );
+        BigInt::Rossi balanceWeiRossi = Helpers::etherStrToRossi( fAccountModel.data(index, BalanceRole).toString() );
         const BigInt::Rossi gasRossi = Helpers::decStrToRossi(gas);
-        const BigInt::Rossi gasPriceRossi = Helpers::shiftStrToRossi(fGasPrice);
+        const BigInt::Rossi gasPriceRossi = Helpers::etherStrToRossi(fGasPrice);
         const BigInt::Rossi gasTotalRossi = gasRossi * gasPriceRossi;
 
         if ( balanceWeiRossi < gasTotalRossi ) {
@@ -320,7 +356,7 @@ namespace Etherwall {
 
         const QString resultWei = QString(resultWeiRossi.toStrDec().data());
 
-        return Helpers::weiStrToShiftStr(resultWei);
+        return Helpers::weiStrToEtherStr(resultWei);
     }
 
     void TransactionModel::lookupAccountsAliases() {
@@ -338,12 +374,13 @@ namespace Etherwall {
     }
 
     void TransactionModel::loadHistory() {
-        if ( fAccountModel.rowCount() == 0 ) {
-            return; // don't try with empty request
+        QSettings settings;
+        if ( fAccountModel.rowCount() == 0 || settings.value("gshift/testnet", false).toBool() ) {
+            return; // don't try with empty request or on test net
         }
 
         // get historical transactions from etherdata
-        QNetworkRequest request(QUrl("http://data.SHIFT Wallet based on etherwall.com/api/transactions"));
+        QNetworkRequest request(QUrl("http://data.shiftwallet.com/api/transactions"));
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         QJsonObject objectJson;
         objectJson["accounts"] = fAccountModel.getAccountsJsonArray();
@@ -354,7 +391,7 @@ namespace Etherwall {
         fNetManager.post(request, data);
     }
 
-    void TransactionModel::loadHistoryDone(QNetworkReply *reply) {
+    void TransactionModel::loadRequestDone(QNetworkReply *reply) {
         if ( reply == NULL ) {
             return ShiftLog::logMsg("Undefined history reply", LS_Error);
         }
@@ -376,7 +413,8 @@ namespace Etherwall {
             const QString error = resObj.value("error").toString("unknown error");
             return ShiftLog::logMsg("Response error: " + error, LS_Error);
         }
-        const QJsonArray result = resObj.value("result").toArray();
+        const QJsonValue rv = resObj.value("result");
+        const QJsonArray result = rv.toArray();
 
         int stored = 0;
         foreach ( const QJsonValue jv, result ) {

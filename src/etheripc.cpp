@@ -1,27 +1,33 @@
     /*
-    This file is part of SHIFT Wallet based on etherwall.
-    SHIFT Wallet based on etherwall is free software: you can redistribute it and/or modify
+    This file is part of shiftwallet.
+    shiftwallet is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    SHIFT Wallet based on etherwall is distributed in the hope that it will be useful,
+    shiftwallet is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with SHIFT Wallet based on etherwall. If not, see <http://www.gnu.org/licenses/>.
+    along with shiftwallet. If not, see <http://www.gnu.org/licenses/>.
 */
-/** @file shiftipc.cpp
+/** @file etheripc.cpp
  * @author Ales Katona <almindor@gmail.com>
  * @date 2015
  *
- * SHIFT IPC client implementation
+ * Ethereum IPC client implementation
  */
 
-#include "shiftipc.h"
+#include "etheripc.h"
 #include <QSettings>
+#include <QFileInfo>
 
-namespace Etherwall {
+// windblows hacks coz windblows sucks
+#ifdef Q_OS_WIN32
+    #include <windows.h>
+#endif
+
+namespace ShiftWallet {
 
 // *************************** RequestIPC **************************** //
     int RequestIPC::sCallID = 0;
@@ -64,50 +70,201 @@ namespace Etherwall {
         return fBurden;
     }
 
-// *************************** ShiftIPC **************************** //
+// *************************** EtherIPC **************************** //
 
-    ShiftIPC::ShiftIPC() : fFilterID(-1), fClosingApp(false), fAborted(false), fPeerCount(0), fActiveRequest(None)
+    EtherIPC::EtherIPC(const QString& ipcPath, GshiftLog& gshiftLog) :
+        fPath(ipcPath), fFilterID(), fClosingApp(false), fPeerCount(0), fActiveRequest(None),
+        fGshift(), fStarting(0), fGshiftLog(gshiftLog),
+        fSyncing(false), fCurrentBlock(0), fHighestBlock(0), fStartingBlock(0),
+        fConnectAttempts(0), fKillTime(), fExternal(false)
     {
-        connect(&fSocket, (void (QLocalSocket::*)(QLocalSocket::LocalSocketError))&QLocalSocket::error, this, &ShiftIPC::onSocketError);
-        connect(&fSocket, &QLocalSocket::readyRead, this, &ShiftIPC::onSocketReadyRead);
-        connect(&fSocket, &QLocalSocket::connected, this, &ShiftIPC::connectedToServer);
-        connect(&fSocket, &QLocalSocket::disconnected, this, &ShiftIPC::disconnectedFromServer);
+        connect(&fSocket, (void (QLocalSocket::*)(QLocalSocket::LocalSocketError))&QLocalSocket::error, this, &EtherIPC::onSocketError);
+        connect(&fSocket, &QLocalSocket::readyRead, this, &EtherIPC::onSocketReadyRead);
+        connect(&fSocket, &QLocalSocket::connected, this, &EtherIPC::connectedToServer);
+        connect(&fSocket, &QLocalSocket::disconnected, this, &EtherIPC::disconnectedFromServer);
+        connect(&fGshift, &QProcess::started, this, &EtherIPC::connectToServer);
 
         const QSettings settings;
 
         fTimer.setInterval(settings.value("ipc/interval", 10).toInt() * 1000);
-        connect(&fTimer, &QTimer::timeout, this, &ShiftIPC::onTimer);
+        connect(&fTimer, &QTimer::timeout, this, &EtherIPC::onTimer);
     }
 
-    bool ShiftIPC::getBusy() const {
+    EtherIPC::~EtherIPC() {
+        fGshift.kill();
+    }
+
+    void EtherIPC::init() {        
+        fConnectAttempts = 0;
+        if ( fStarting <= 0 ) { // try to connect without starting gshift
+            ShiftLog::logMsg("ShiftWallet starting", LS_Info);
+            fStarting = 1;
+            emit startingChanged(fStarting);
+            return connectToServer();
+        }
+
+        const QSettings settings;
+
+        const QString progStr = settings.value("gshift/path", DefaultGshiftPath()).toString();
+        const QString argStr = settings.value("gshift/args", DefaultGshiftArgs).toString();
+        const QString ddStr = settings.value("gshift/datadir", DefaultDataDir).toString();
+        QStringList args = (argStr + " --datadir " + ddStr).split(' ', QString::SkipEmptyParts);
+        bool testnet = settings.value("gshift/testnet", false).toBool();
+        if ( testnet ) {
+            args.append("--testnet");
+        }
+
+        QFileInfo info(progStr);
+        if ( !info.exists() || !info.isExecutable() ) {
+            fStarting = -1;
+            emit startingChanged(-1);
+            setError("Could not find Gshift. Please check Gshift path and try again.");
+            return bail();
+        }
+
+        ShiftLog::logMsg("Gshift starting " + progStr + " " + argStr, LS_Info);
+        fStarting = 2;
+
+        fGshiftLog.attach(&fGshift);
+        fGshift.start(progStr, args);
+        emit startingChanged(0);
+    }
+
+    void EtherIPC::waitConnect() {
+        if ( fStarting == 1 ) {
+            return init();
+        }
+
+        if ( fStarting != 1 && fStarting != 2 ) {
+            return connectionTimeout();
+        }
+
+        if ( ++fConnectAttempts < 60 ) {
+            if ( fSocket.state() == QLocalSocket::ConnectingState ) {
+                fSocket.abort();
+            }
+
+            connectToServer();
+        } else {
+            connectionTimeout();
+        }
+    }
+
+    void EtherIPC::connectToServer() {
+        fActiveRequest = RequestIPC(Full);
+        emit busyChanged(getBusy());
+        if ( fSocket.state() != QLocalSocket::UnconnectedState ) {
+            setError("Already connected");
+            return bail();
+        }
+
+        fSocket.connectToServer(fPath);
+        if ( fConnectAttempts == 0 ) {
+            if ( fStarting == 1 ) {
+                ShiftLog::logMsg("Checking to see if there is an already running gshift...");
+            } else {
+                ShiftLog::logMsg("Connecting to IPC socket " + fPath);
+            }
+        }
+
+        QTimer::singleShot(2000, this, SLOT(waitConnect()));
+    }
+
+    void EtherIPC::connectedToServer() {
+        done();
+
+        getClientVersion();
+        getBlockNumber(); // initial
+        newFilter();
+
+        fTimer.start(); // should happen after filter creation, might need to move into last filter response handler
+        // if we connected to external gshift, put that info in gshift log
+        if ( fStarting == 1 ) {
+            fExternal = true;
+            emit externalChanged(true);
+            fGshiftLog.append("Attached to external gshift, see logs in terminal window.");
+        }
+        fStarting = 3;
+
+        ShiftLog::logMsg("Connected to IPC socket");
+        emit startingChanged(fStarting);
+        emit connectToServerDone();
+        emit connectionStateChanged();
+    }
+
+    void EtherIPC::connectionTimeout() {
+        if ( fSocket.state() != QLocalSocket::ConnectedState ) {
+            fSocket.abort();
+            fStarting = -1;
+            setError("Unable to establish IPC connection to Gshift. Fix path to Gshift and try again.");
+            bail();
+        }
+    }
+
+    bool EtherIPC::getBusy() const {
         return (fActiveRequest.burden() != None);
     }
 
-    const QString& ShiftIPC::getError() const {
+    bool EtherIPC::getExternal() const {
+        return fExternal;
+    }
+
+    bool EtherIPC::getStarting() const {
+        return (fStarting == 1 || fStarting == 2);
+    }
+
+    bool EtherIPC::getClosing() const {
+        return fClosingApp;
+    }
+
+    const QString& EtherIPC::getError() const {
         return fError;
     }
 
-    int ShiftIPC::getCode() const {
+    int EtherIPC::getCode() const {
         return fCode;
     }
 
-    void ShiftIPC::setInterval(int interval) {
+
+    void EtherIPC::setInterval(int interval) {
         fTimer.setInterval(interval);
     }
 
-    bool ShiftIPC::closeApp() {
-        fClosingApp = true;
-        fTimer.stop();
-
-        if ( fSocket.state() == QLocalSocket::UnconnectedState ) {
+    bool EtherIPC::killGshift() {
+        if ( fGshift.state() == QProcess::NotRunning ) {
             return true;
         }
+
+        if ( fKillTime.elapsed() == 0 ) {
+            fKillTime.start();
+#ifdef Q_OS_WIN32
+            SetConsoleCtrlHandler(NULL, true);
+            AttachConsole(fGshift.processId());
+            GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
+            FreeConsole();
+#else
+            fGshift.terminate();
+#endif
+        } else if ( fKillTime.elapsed() > 6000 ) {
+            qDebug() << "Gshift did not exit in 6 seconds. Killing...\n";
+            fGshift.kill();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EtherIPC::closeApp() {
+        ShiftLog::logMsg("Closing shiftwallet");
+        fClosingApp = true;
+        fTimer.stop();
+        emit closingChanged(true);
 
         if ( fSocket.state() == QLocalSocket::ConnectedState && getBusy() ) { // wait for operation first if we're still connected
             return false;
         }
 
-        if ( fSocket.state() == QLocalSocket::ConnectedState && fFilterID >= 0 ) { // remove filter if still connected
+        if ( fSocket.state() == QLocalSocket::ConnectedState && !fFilterID.isEmpty() ) { // remove filter if still connected
             uninstallFilter();
             return false;
         }
@@ -118,51 +275,11 @@ namespace Etherwall {
             return false;
         }
 
-        return true;
+        return killGshift();
     }
 
-    void ShiftIPC::connectToServer(const QString& path) {
-        if ( fAborted ) {
-            bail();
-            return;
-        }
-
-        fActiveRequest = RequestIPC(Full);
-        emit busyChanged(getBusy());
-        fPath = path;
-        if ( fSocket.state() != QLocalSocket::UnconnectedState ) {
-            setError("Already connected");
-            return bail();
-        }
-
-        fSocket.connectToServer(path);
-        ShiftLog::logMsg("Connecting to IPC socket");
-
-        QTimer::singleShot(2000, this, SLOT(connectionTimeout()));
-    }
-
-    void ShiftIPC::connectedToServer() {
-        done();
-
-        getClientVersion();
-        getBlockNumber(); // initial
-        fTimer.start(); // should happen after filter creation, might need to move into last filter response handler
-
-        ShiftLog::logMsg("Connected to IPC socket");
-        emit connectToServerDone();
-        emit connectionStateChanged();
-    }
-
-    void ShiftIPC::connectionTimeout() {
-        if ( !fAborted && fSocket.state() != QLocalSocket::ConnectedState ) {
-            fSocket.abort();
-            setError("Unable to establish IPC connection to gshift. Make sure gshift is running and try again.");
-            bail();
-        }
-    }
-
-    void ShiftIPC::disconnectedFromServer() {
-        if ( fClosingApp || fAborted ) { // expected
+    void EtherIPC::disconnectedFromServer() {
+        if ( fClosingApp ) { // expected
             return;
         }
 
@@ -170,14 +287,14 @@ namespace Etherwall {
         bail();
     }
 
-    void ShiftIPC::getAccounts() {
+    void EtherIPC::getAccounts() {
         fAccountList.clear();
         if ( !queueRequest(RequestIPC(GetAccountRefs, "personal_listAccounts", QJsonArray())) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleGetAccounts() {
+    void EtherIPC::handleGetAccounts() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -190,14 +307,10 @@ namespace Etherwall {
         }
 
         emit getAccountsDone(fAccountList);
-
-        // TODO: figure out a way to get account transaction history
-        newFilter();
-
         done();
     }
 
-    bool ShiftIPC::refreshAccount(const QString& hash, int index) {
+    bool EtherIPC::refreshAccount(const QString& hash, int index) {
         if ( getBalance(hash, index) ) {
             return getTransactionCount(hash, index);
         }
@@ -205,7 +318,7 @@ namespace Etherwall {
         return false;
     }
 
-    bool ShiftIPC::getBalance(const QString& hash, int index) {
+    bool EtherIPC::getBalance(const QString& hash, int index) {
         QJsonArray params;
         params.append(hash);
         params.append(QString("latest"));
@@ -217,7 +330,7 @@ namespace Etherwall {
         return true;
     }
 
-    bool ShiftIPC::getTransactionCount(const QString& hash, int index) {
+    bool EtherIPC::getTransactionCount(const QString& hash, int index) {
         QJsonArray params;
         params.append(hash);
         params.append(QString("latest"));
@@ -230,13 +343,13 @@ namespace Etherwall {
     }
 
 
-    void ShiftIPC::handleAccountBalance() {
+    void EtherIPC::handleAccountBalance() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
         }
 
-        const QString decStr = Helpers::toDecStrShift(jv);
+        const QString decStr = Helpers::toDecStrEther(jv);
         const int index = fActiveRequest.getIndex();
         fAccountList[index].setBalance(decStr);
 
@@ -244,7 +357,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::handleAccountTransactionCount() {
+    void EtherIPC::handleAccountTransactionCount() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -260,7 +373,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::newAccount(const QString& password, int index) {
+    void EtherIPC::newAccount(const QString& password, int index) {
         QJsonArray params;
         params.append(password);
         if ( !queueRequest(RequestIPC(NewAccount, "personal_newAccount", params, index)) ) {
@@ -268,7 +381,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleNewAccount() {
+    void EtherIPC::handleNewAccount() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -279,7 +392,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::deleteAccount(const QString& hash, const QString& password, int index) {
+    void EtherIPC::deleteAccount(const QString& hash, const QString& password, int index) {
         QJsonArray params;
         params.append(hash);
         params.append(password);        
@@ -288,7 +401,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleDeleteAccount() {
+    void EtherIPC::handleDeleteAccount() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -299,13 +412,13 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::getBlockNumber() {
+    void EtherIPC::getBlockNumber() {
         if ( !queueRequest(RequestIPC(NonVisual, GetBlockNumber, "shf_blockNumber")) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleGetBlockNumber() {
+    void EtherIPC::handleGetBlockNumber() {
         quint64 result;
         if ( !readNumber(result) ) {
              return bail();
@@ -315,13 +428,13 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::getPeerCount() {
+    void EtherIPC::getPeerCount() {
         if ( !queueRequest(RequestIPC(NonVisual, GetPeerCount, "net_peerCount")) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleGetPeerCount() {
+    void EtherIPC::handleGetPeerCount() {
         if ( !readNumber(fPeerCount) ) {
              return bail();
         }
@@ -330,7 +443,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::sendTransaction(const QString& from, const QString& to, const QString& valStr, const QString& gas) {
+    void EtherIPC::sendTransaction(const QString& from, const QString& to, const QString& valStr, const QString& gas) {
         QJsonArray params;
         const QString valHex = Helpers::toHexWeiStr(valStr);
         ShiftLog::logMsg(QString("Trans Value: ") + valStr + QString(" HexValue: ") + valHex);
@@ -351,7 +464,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleSendTransaction() {
+    void EtherIPC::handleSendTransaction() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail(true); // softbail
@@ -362,7 +475,7 @@ namespace Etherwall {
         done();
     }
 
-    int ShiftIPC::getConnectionState() const {
+    int EtherIPC::getConnectionState() const {
         if ( fSocket.state() == QLocalSocket::ConnectedState ) {
             return 1; // TODO: add higher states per peer count!
         }
@@ -370,7 +483,7 @@ namespace Etherwall {
         return 0;
     }
 
-    void ShiftIPC::unlockAccount(const QString& hash, const QString& password, int duration, int index) {
+    void EtherIPC::unlockAccount(const QString& hash, const QString& password, int duration, int index) {
         QJsonArray params;
         params.append(hash);
         params.append(password);
@@ -384,48 +497,47 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleUnlockAccount() {
+    void EtherIPC::handleUnlockAccount() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
-            return bail();
+            // special case, we def. need to remove all subrequests, but not stop timer
+            fRequestQueue.clear();
+            return bail(true);
         }
 
         const bool result = jv.toBool(false);
 
         if ( !result ) {
             setError("Unlock account failure");
-            if ( parseVersionNum() == 100002 ) {
-                fError += " gshift v1.0.2 has a bug with unlocking empty password accounts! Consider updating";
-            }
             emit error();
         }
         emit unlockAccountDone(result, fActiveRequest.getIndex());
         done();
     }
 
-    void ShiftIPC::getGasPrice() {
-        if ( !queueRequest(RequestIPC(GetGasPrice, "shf_nrgPrice")) ) {
+    void EtherIPC::getGasPrice() {
+        if ( !queueRequest(RequestIPC(GetGasPrice, "shf_gasPrice")) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleGetGasPrice() {
+    void EtherIPC::handleGetGasPrice() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
         }
 
-        const QString decStr = Helpers::toDecStrShift(jv);
+        const QString decStr = Helpers::toDecStrEther(jv);
 
         emit getGasPriceDone(decStr);
         done();
     }
 
-    quint64 ShiftIPC::peerCount() const {
+    quint64 EtherIPC::peerCount() const {
         return fPeerCount;
     }
 
-    void ShiftIPC::estimateGas(const QString& from, const QString& to, const QString& value) {
+    void EtherIPC::estimateGas(const QString& from, const QString& to, const QString& value) {
         QJsonArray params;
         QJsonObject o;
         o["to"] = to;
@@ -439,7 +551,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleEstimateGas() {
+    void EtherIPC::handleEstimateGas() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -452,21 +564,26 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::newFilter() {
+    void EtherIPC::newFilter() {
+        if ( !fFilterID.isEmpty() ) {
+            setError("Filter already set");
+            return bail(true);
+        }
+
         if ( !queueRequest(RequestIPC(NewFilter, "shf_newBlockFilter")) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleNewFilter() {
-        BigInt::Vin bv;
-        if ( !readVin(bv) ) {
+    void EtherIPC::handleNewFilter() {
+        QJsonValue jv;
+        if ( !readReply(jv) ) {
             return bail();
         }
-        const QString strDec = QString(bv.toStrDec().data());
-        fFilterID = strDec.toInt();
+        fFilterID = jv.toString();
+        //qDebug() << "new filter: " << fFilterID << "\n";
 
-        if ( fFilterID < 0 ) {
+        if ( fFilterID.isEmpty() ) {
             setError("Filter ID invalid");
             return bail();
         }
@@ -474,13 +591,19 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::onTimer() {
+    void EtherIPC::onTimer() {
         getPeerCount();
-        getFilterChanges(fFilterID);
+        getSyncing();
+
+        if ( !fFilterID.isEmpty() && !fSyncing ) {
+            getFilterChanges(fFilterID);
+        } else {
+            getBlockNumber();
+        }
     }
 
-    int ShiftIPC::parseVersionNum() const {
-        QRegExp reg("^gshift/v([0-9]+)\\.([0-9]+)\\.([0-9]+).*$");
+    int EtherIPC::parseVersionNum() const {
+        QRegExp reg("^Gshift/v([0-9]+)\\.([0-9]+)\\.([0-9]+).*$");
         reg.indexIn(fClientVersion);
         if ( reg.captureCount() == 3 ) try { // it's gshift
             return reg.cap(1).toInt() * 100000 + reg.cap(2).toInt() * 1000 + reg.cap(3).toInt();
@@ -491,35 +614,34 @@ namespace Etherwall {
         return 0;
     }
 
-    void ShiftIPC::getFilterChanges(int filterID) {
+    void EtherIPC::getSyncing() {
+        if ( !queueRequest(RequestIPC(NonVisual, GetSyncing, "shf_syncing")) ) {
+            return bail();
+        }
+    }
+
+    void EtherIPC::getFilterChanges(const QString& filterID) {
         if ( filterID < 0 ) {
             setError("Filter ID invalid");
             return bail();
         }
 
         QJsonArray params;
-        BigInt::Vin vinVal(filterID);
-        QString strHex = QString(vinVal.toStr0xHex().data());
-        params.append(strHex);
+        params.append(filterID);
 
-        if ( !queueRequest(RequestIPC(NonVisual, GetFilterChanges, "shf_getFilterChanges", params, filterID)) ) {
+        if ( !queueRequest(RequestIPC(NonVisual, GetFilterChanges, "shf_getFilterChanges", params)) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::getClientVersion() {
-        if ( !queueRequest(RequestIPC(NonVisual, GetClientVersion, "web3_clientVersion")) ) {
-            return bail();
-        }
-    }
-
-    void ShiftIPC::handleGetFilterChanges() {
+    void EtherIPC::handleGetFilterChanges() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
         }
 
         QJsonArray ar = jv.toArray();
+        //qDebug() << "got filter changes: " << ar.size() << "\n";
         foreach( const QJsonValue v, ar ) {
            const QString hash = v.toString("bogus");
            getBlockByHash(hash);
@@ -528,29 +650,56 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::uninstallFilter() {
+    void EtherIPC::uninstallFilter() {
+        if ( fFilterID.isEmpty() ) {
+            setError("Filter not set");
+            return bail(true);
+        }
+
+        //qDebug() << "uninstalling filter: " << fFilterID << "\n";
+
         QJsonArray params;
-        BigInt::Vin vinVal(fFilterID);
-        QString strHex = QString(vinVal.toStr0xHex().data());
-        params.append(strHex);
+        params.append(fFilterID);
 
         if ( !queueRequest(RequestIPC(UninstallFilter, "shf_uninstallFilter", params)) ) {
             return bail();
         }
     }
 
-    void ShiftIPC::handleUninstallFilter() {
+    void EtherIPC::handleUninstallFilter() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
         }
 
-        fFilterID = -1;
+        fFilterID.clear();
 
         done();
     }
 
-    void ShiftIPC::getTransactionByHash(const QString& hash) {
+    void EtherIPC::getClientVersion() {
+        if ( !queueRequest(RequestIPC(NonVisual, GetClientVersion, "web3_clientVersion")) ) {
+            return bail();
+        }
+    }
+
+    bool EtherIPC::getSyncingVal() const {
+        return fSyncing;
+    }
+
+    quint64 EtherIPC::getCurrentBlock() const {
+        return fCurrentBlock;
+    }
+
+    quint64 EtherIPC::getHighestBlock() const {
+        return fHighestBlock;
+    }
+
+    quint64 EtherIPC::getStartingBlock() const {
+        return fStartingBlock;
+    }
+
+    void EtherIPC::getTransactionByHash(const QString& hash) {
         QJsonArray params;
         params.append(hash);
 
@@ -559,7 +708,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleGetTransactionByHash() {
+    void EtherIPC::handleGetTransactionByHash() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -569,7 +718,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::getBlockByHash(const QString& hash) {
+    void EtherIPC::getBlockByHash(const QString& hash) {
         QJsonArray params;
         params.append(hash);
         params.append(true); // get transaction bodies
@@ -579,7 +728,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::getBlockByNumber(quint64 blockNum) {
+    void EtherIPC::getBlockByNumber(quint64 blockNum) {
         QJsonArray params;
         params.append(Helpers::toHexStr(blockNum));
         params.append(true); // get transaction bodies
@@ -589,7 +738,7 @@ namespace Etherwall {
         }
     }
 
-    void ShiftIPC::handleGetBlock() {
+    void EtherIPC::handleGetBlock() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -602,7 +751,7 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::handleGetClientVersion() {
+    void EtherIPC::handleGetClientVersion() {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return bail();
@@ -612,7 +761,12 @@ namespace Etherwall {
 
         const int vn = parseVersionNum();
         if ( vn > 0 && vn < 100002 ) {
-            setError("gshift version 2.0.0 and older contain a critical bug! Please update immediately.");
+            setError("Gshift version 1.0.1 and older contain a critical bug! Please update immediately.");
+            emit error();
+        }
+
+        if ( vn > 0 && vn < 103005 ) {
+            setError("Gshift version 1.3.4 and older are Frontier versions. Please update to Homestead (1.3.5+)");
             emit error();
         }
 
@@ -620,14 +774,40 @@ namespace Etherwall {
         done();
     }
 
-    void ShiftIPC::abort() {
-        fAborted = true;
-        bail();
-        fSocket.abort();
-        emit connectionStateChanged();
+    void EtherIPC::handleGetSyncing() {
+        QJsonValue jv;
+        if ( !readReply(jv) ) {
+            return bail();
+        }
+
+        if ( jv.isNull() || ( jv.isBool() && !jv.toBool(false) ) ) {
+            if ( fSyncing ) {
+                fSyncing = false;
+                if ( fFilterID.isEmpty() ) {
+                    newFilter();
+                }
+                emit syncingChanged(fSyncing);
+            }
+
+            return done();
+        }
+
+        const QJsonObject syncing = jv.toObject();
+        fCurrentBlock = Helpers::toQUInt64(syncing.value("currentBlock"));
+        fHighestBlock = Helpers::toQUInt64(syncing.value("highestBlock"));
+        fStartingBlock = Helpers::toQUInt64(syncing.value("startingBlock"));
+        if ( !fSyncing ) {
+            if ( !fFilterID.isEmpty() ) {
+                uninstallFilter();
+            }
+            fSyncing = true;
+        }
+
+        emit syncingChanged(fSyncing);
+        done();
     }
 
-    void ShiftIPC::bail(bool soft) {
+    void EtherIPC::bail(bool soft) {
         qDebug() << "BAIL[" << soft << "]: " << fError << "\n";
 
         if ( !soft ) {
@@ -639,18 +819,18 @@ namespace Etherwall {
         errorOut();
     }
 
-    void ShiftIPC::setError(const QString& error) {
+    void EtherIPC::setError(const QString& error) {
         fError = error;
         ShiftLog::logMsg(error, LS_Error);
     }
 
-    void ShiftIPC::errorOut() {
+    void EtherIPC::errorOut() {
         emit error();
         emit connectionStateChanged();
         done();
     }
 
-    void ShiftIPC::done() {
+    void EtherIPC::done() {
         fActiveRequest = RequestIPC(None);
         if ( !fRequestQueue.isEmpty() ) {
             const RequestIPC request = fRequestQueue.first();
@@ -661,7 +841,7 @@ namespace Etherwall {
         }
     }
 
-    QJsonObject ShiftIPC::methodToJSON(const RequestIPC& request) {
+    QJsonObject EtherIPC::methodToJSON(const RequestIPC& request) {
         QJsonObject result;
 
         result.insert("jsonrpc", QJsonValue(QString("2.0")));
@@ -672,7 +852,7 @@ namespace Etherwall {
         return result;
     }
 
-    bool ShiftIPC::queueRequest(const RequestIPC& request) {
+    bool EtherIPC::queueRequest(const RequestIPC& request) {
         if ( fActiveRequest.burden() == None ) {
             return writeRequest(request);
         } else {
@@ -681,7 +861,7 @@ namespace Etherwall {
         }
     }
 
-    bool ShiftIPC::writeRequest(const RequestIPC& request) {
+    bool EtherIPC::writeRequest(const RequestIPC& request) {
         fActiveRequest = request;
         if ( fActiveRequest.burden() == Full ) {
             emit busyChanged(getBusy());
@@ -709,8 +889,8 @@ namespace Etherwall {
         return true;
     }
 
-    bool ShiftIPC::readData() {
-        fReadBuffer += QString(fSocket.readAll());
+    bool EtherIPC::readData() {
+        fReadBuffer += QString(fSocket.readAll()).trimmed();
 
         if ( fReadBuffer.at(0) == '{' && fReadBuffer.at(fReadBuffer.length() - 1) == '}' && fReadBuffer.count('{') == fReadBuffer.count('}') ) {
             ShiftLog::logMsg("Received: " + fReadBuffer, LS_Debug);
@@ -720,7 +900,7 @@ namespace Etherwall {
         return false;
     }
 
-    bool ShiftIPC::readReply(QJsonValue& result) {
+    bool EtherIPC::readReply(QJsonValue& result) {
         const QString data = fReadBuffer;
         fReadBuffer.clear();
 
@@ -774,7 +954,7 @@ namespace Etherwall {
         return true;
     }
 
-    bool ShiftIPC::readVin(BigInt::Vin& result) {
+    bool EtherIPC::readVin(BigInt::Vin& result) {
         QJsonValue jv;
         if ( !readReply(jv) ) {
             return false;
@@ -786,7 +966,7 @@ namespace Etherwall {
         return true;
     }
 
-    bool ShiftIPC::readNumber(quint64& result) {
+    bool EtherIPC::readNumber(quint64& result) {
         BigInt::Vin r;
         if ( !readVin(r) ) {
             return false;
@@ -796,16 +976,12 @@ namespace Etherwall {
         return true;
     }
 
-    void ShiftIPC::onSocketError(QLocalSocket::LocalSocketError err) {
-        if ( fAborted ) {
-            return; // ignore
-        }
-
+    void EtherIPC::onSocketError(QLocalSocket::LocalSocketError err) {
         fError = fSocket.errorString();
         fCode = err;
     }
 
-    void ShiftIPC::onSocketReadyRead() {
+    void EtherIPC::onSocketReadyRead() {
         if ( !getBusy() ) {
             return; // probably error-ed out
         }
@@ -881,6 +1057,10 @@ namespace Etherwall {
             }
         case GetClientVersion: {
                 handleGetClientVersion();
+                break;
+            }
+        case GetSyncing: {
+                handleGetSyncing();
                 break;
             }
         default: qDebug() << "Unknown reply: " << fActiveRequest.getType() << "\n"; break;

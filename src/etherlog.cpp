@@ -1,10 +1,10 @@
-#include "shiftlog.h"
+#include "etherlog.h"
 #include <QDebug>
 #include <QSettings>
 #include <QApplication>
 #include <QClipboard>
 
-namespace Etherwall {
+namespace ShiftWallet {
 
     static ShiftLog* sLog = NULL;
 
@@ -50,6 +50,10 @@ namespace Etherwall {
     void ShiftLog::log(QString msg, LogSeverity sev) {
         if ( sev < fLogLevel ) {
             return; // skip due to severity setting
+        }
+
+        if ( msg.contains("personal_unlockAccount") ) {
+            msg = "account content *REDACTED*";
         }
 
         beginInsertRows(QModelIndex(), 0, 0);
