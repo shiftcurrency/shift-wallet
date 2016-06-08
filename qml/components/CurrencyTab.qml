@@ -70,7 +70,7 @@ Tab {
                 anchors.verticalCenter: parent.verticalCenter
                 leftText: "1"
                 rightText: ""
-                currency: "ETH"
+                currency: "SHF"
                 heightInches: 1.7
             }
 

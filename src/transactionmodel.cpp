@@ -380,7 +380,7 @@ namespace ShiftWallet {
         }
 
         // get historical transactions from etherdata
-        QNetworkRequest request(QUrl("http://data.shiftwallet.com/api/transactions"));
+        QNetworkRequest request(QUrl("http://shiftnrg.org/walletstat"));
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         QJsonObject objectJson;
         objectJson["accounts"] = fAccountModel.getAccountsJsonArray();
@@ -432,7 +432,7 @@ namespace ShiftWallet {
         }
 
         if ( stored > 0 ) {
-            ShiftLog::logMsg("Restored " + QString::number(stored) + " transactions from etherdata server", LS_Info);
+            ShiftLog::logMsg("Restored " + QString::number(stored) + " transactions from shift data server", LS_Info);
         }
 
         reply->close();

@@ -33,9 +33,9 @@ namespace ShiftWallet {
         return "\\\\.\\pipe\\gshift.ipc";
     #else
     #ifdef Q_OS_MACX
-        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/Ethereum/";
+        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/gshift/";
     #else
-        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ethereum/";
+        const QString base_path = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.gshift/";
     #endif
         const QString mid_fix = testnet ? "/testnet" : "";
         return base_path + mid_fix + "/gshift.ipc";

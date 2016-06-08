@@ -6,7 +6,7 @@ ShiftWallet is a free software wallet/front-end for Shift Gshift*.
 
 ## Usage
 
-Gshift 1.3.5+ is required to be running for ShiftWallet to work.
+Gshift 2.6.0+ is required to be running for ShiftWallet to work.
 
 ShiftWallet should auto-detect gshift's IPC file/name and work "out of the box" as long as gshift is running.
 
@@ -36,7 +36,7 @@ ShiftWallet is licensed under the GPLv3 license. See LICENSE for more info.
 
 ### Requirements
 
-Gshift 1.3.5+
+Gshift 2.6.0+
 
 Qt5.2+ with qmake
 

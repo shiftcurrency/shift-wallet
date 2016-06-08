@@ -34,12 +34,12 @@
 namespace ShiftWallet {
 
 #ifdef Q_OS_WIN32
-    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Ethereum";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/gshift";
 #else
     #ifdef Q_OS_MACX
-    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/Ethereum";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/Library/gshift";
     #else
-    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ethereum";
+    static const QString DefaultDataDir = QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.gshift";
     #endif
 #endif
 

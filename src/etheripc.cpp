@@ -15,7 +15,7 @@
  * @author Ales Katona <almindor@gmail.com>
  * @date 2015
  *
- * Ethereum IPC client implementation
+ * Shift IPC client implementation
  */
 
 #include "etheripc.h"
