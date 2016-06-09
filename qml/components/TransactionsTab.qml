@@ -170,7 +170,7 @@ Tab {
                             return
                         }
 
-                        transactionSendDialog.msg = qsTr("Confirm send of Ξ") + result.value + qsTr(" to: ") + result.to
+                        transactionSendDialog.msg = qsTr("Confirm send of SHIFT") + result.value + qsTr(" to: ") + result.to
                         transactionSendDialog.open()
                     }
                 }

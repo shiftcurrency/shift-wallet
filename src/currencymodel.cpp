@@ -79,7 +79,7 @@ namespace ShiftWallet {
 
     void CurrencyModel::loadCurrencies() {
         fCurrencies.clear();
-        fCurrencies.append(CurrencyInfo("SHF", 1.0));
+        fCurrencies.append(CurrencyInfo("SHIFT", 1.0));
 
         // get currency data from etherdata
         QNetworkRequest request(QUrl("http://data.shiftwallet.com/api/currencies"));
