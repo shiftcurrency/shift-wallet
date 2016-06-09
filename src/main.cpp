@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Etherdyne");
     QCoreApplication::setOrganizationDomain("shiftwallet.com");
     QCoreApplication::setApplicationName("ShiftWallet");
-    QCoreApplication::setApplicationVersion("1.5.0");
+    QCoreApplication::setApplicationVersion("1.5.1");
     app.setWindowIcon(QIcon(QPixmap(":/images/icon")));
 
     QTranslator translator;
