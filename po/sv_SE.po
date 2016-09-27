@@ -331,8 +331,8 @@ msgstr "AVGIFT"
 #: partials/modals/registrationDelegateModal.html:23
 #: partials/modals/secondPassphraseModal.html:28
 #: partials/modals/sendTransaction.html:31 partials/modals/vote.html:25
-msgid "Fee: {{fee | liskFilter}} LSK"
-msgstr "Avgift: {{fee | liskFilter}} LSK"
+msgid "Fee: {{fee | liskFilter}} SHIFT"
+msgstr "Avgift: {{fee | liskFilter}} SHIFT"
 
 #: partials/forging.html:74
 msgid "Forged Blocks"
@@ -509,12 +509,12 @@ msgid "Logout"
 msgstr "Logga ut"
 
 #: partials/modals/sendTransaction.html:29
-msgid "LSK Amount"
-msgstr "LSK-summa"
+msgid "SHIFT Amount"
+msgstr "SHIFT-summa"
 
 #: partials/forging.html:11
-msgid "LSK Earned"
-msgstr "LSK intjänade"
+msgid "SHIFT Earned"
+msgstr "SHIFT intjänade"
 
 #: partials/modals/newUser.html:72
 msgid ""
@@ -553,10 +553,10 @@ msgstr ""
 
 #: partials/modals/sendTransaction.html:41
 msgid ""
-"Make sure you're sending LSK to the right address. This action can't be "
+"Make sure you're sending SHIFT to the right address. This action can't be "
 "undone later."
 msgstr ""
-"Se till så att du skickar LSK till rätt adress. Denna handling kan inte "
+"Se till så att du skickar SHIFT till rätt adress. Denna handling kan inte "
 "ångras senare."
 
 #: js/controllers/modals/masterPassphraseModalController.js:9
@@ -691,10 +691,10 @@ msgstr "Väntande transaktioner"
 #: partials/modals/multisignatureModal.html:107
 msgid ""
 "Please check your input below and go back if necessary. Double-check the "
-"group members, else you risk losing your LSK balance!"
+"group members, else you risk losing your SHIFT balance!"
 msgstr ""
 "Vänligen kontrollera inmatningen nedanför och gå tillbaka om nödvändigt. "
-"Dubbelkolla gruppmedlemmarna, annars riskerar du att förlora din LSK-balans!"
+"Dubbelkolla gruppmedlemmarna, annars riskerar du att förlora din SHIFT-balans!"
 
 #: partials/modals/registrationDelegateModal.html:15
 msgid "Please choose a delegate name."
@@ -718,10 +718,10 @@ msgstr "Vänligen skriv in master-lösenfrasen för denna nod."
 
 #: partials/modals/sendTransaction.html:15
 msgid ""
-"Please enter the Recipient Address and LSK Amount that you would like send "
+"Please enter the Recipient Address and SHIFT Amount that you would like send "
 "below."
 msgstr ""
-"Vänligen skriv in Mottagarens Adress och LSK-belopp som du vill skicka nedan."
+"Vänligen skriv in Mottagarens Adress och SHIFT-belopp som du vill skicka nedan."
 
 #: partials/modals/addDappModal.html:142 partials/modals/forgingModal.html:16
 #: partials/modals/registrationDelegateModal.html:53
@@ -895,8 +895,8 @@ msgstr "skicka lisk"
 #: partials/delegates.html:120 partials/delegates.html:51
 #: partials/modals/sendTransaction.html:13 partials/modals/userInfo.html:28
 #: partials/votes.html:49
-msgid "Send LSK"
-msgstr "Skicka LSK"
+msgid "Send SHIFT"
+msgstr "Skicka SHIFT"
 
 #: js/controllers/transactionsController.js:63 partials/account.html:70
 msgid "Sender"
@@ -1026,7 +1026,7 @@ msgstr ""
 msgid ""
 "This walkthrough will guide you through the necessary steps to create a "
 "multi-signature group. It's very important that you know what multi-"
-"signatures are, else you risk loosing your LSK balance.<br><br>A multi-"
+"signatures are, else you risk loosing your SHIFT balance.<br><br>A multi-"
 "signature group consists of N accounts, the one who created the group is the "
 "group owner. When the owner wants to make a transaction, M of N accounts "
 "within the group need to confirm it, otherwise the transaction will not be "
@@ -1038,7 +1038,7 @@ msgid ""
 msgstr ""
 "Denna genomgång kommer att guida dig genom de nödvändiga stegen för att "
 "skapa en multi-signaturgrupp . Det är mycket viktigt att du vet vad multi-"
-"signaturer är, annars riskerar du att förlora din LSK-balans.<br><br>En "
+"signaturer är, annars riskerar du att förlora din SHIFT-balans.<br><br>En "
 "multi-signaturgrupp består av N konton, den som skapade gruppen är gruppens "
 "ägare. När ägaren vill göra en transaktion, så måste M av N konton inom "
 "gruppen bekräfta det, annars kommer transaktionen inte att behandlas. "

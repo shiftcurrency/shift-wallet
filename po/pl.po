@@ -330,8 +330,8 @@ msgstr "PROWIZJA"
 #: partials/modals/registrationDelegateModal.html:23
 #: partials/modals/secondPassphraseModal.html:28
 #: partials/modals/sendTransaction.html:31 partials/modals/vote.html:25
-msgid "Fee: {{fee | liskFilter}} LSK"
-msgstr "Prowizja: {{fee | liskFilter}} LSK"
+msgid "Fee: {{fee | liskFilter}} SHIFT"
+msgstr "Prowizja: {{fee | liskFilter}} SHIFT"
 
 #: partials/forging.html:74
 msgid "Forged Blocks"
@@ -508,12 +508,12 @@ msgid "Logout"
 msgstr "Wyloguj"
 
 #: partials/modals/sendTransaction.html:29
-msgid "LSK Amount"
-msgstr "Kwota LSK"
+msgid "SHIFT Amount"
+msgstr "Kwota SHIFT"
 
 #: partials/forging.html:11
-msgid "LSK Earned"
-msgstr "Zarobione LSK"
+msgid "SHIFT Earned"
+msgstr "Zarobione SHIFT"
 
 #: partials/modals/newUser.html:72
 msgid ""
@@ -552,10 +552,10 @@ msgstr ""
 
 #: partials/modals/sendTransaction.html:41
 msgid ""
-"Make sure you're sending LSK to the right address. This action can't be "
+"Make sure you're sending SHIFT to the right address. This action can't be "
 "undone later."
 msgstr ""
-"Upewnij się, że wysyłasz LSK na poprawny adres. Ta operacja nie może "
+"Upewnij się, że wysyłasz SHIFT na poprawny adres. Ta operacja nie może "
 "być cofnięta"
 
 #: js/controllers/modals/masterPassphraseModalController.js:9
@@ -690,10 +690,10 @@ msgstr "Transakcje oczekujące"
 #: partials/modals/multisignatureModal.html:107
 msgid ""
 "Please check your input below and go back if necessary. Double-check the "
-"group members, else you risk losing your LSK balance!"
+"group members, else you risk losing your SHIFT balance!"
 msgstr ""
 "Sprawdź wprowadzone dane i wróć jeśli to koniecznie. Sprawdź dwa razy "
-"członków grupy, inaczej ryzykujesz utratę LSK!"
+"członków grupy, inaczej ryzykujesz utratę SHIFT!"
 
 #: partials/modals/registrationDelegateModal.html:15
 msgid "Please choose a delegate name."
@@ -717,9 +717,9 @@ msgstr "Proszę potwierdzić master passphrase dla tego węzła."
 
 #: partials/modals/sendTransaction.html:15
 msgid ""
-"Please enter the Recipient Address and LSK Amount that you would like send "
+"Please enter the Recipient Address and SHIFT Amount that you would like send "
 "below."
-msgstr "Podaj poniżej adres odbiorcy i kwotę LSK którą chcesz wysłać."
+msgstr "Podaj poniżej adres odbiorcy i kwotę SHIFT którą chcesz wysłać."
 
 #: partials/modals/addDappModal.html:142 partials/modals/forgingModal.html:16
 #: partials/modals/registrationDelegateModal.html:53
@@ -892,8 +892,8 @@ msgstr "wyślij lisk"
 #: partials/delegates.html:120 partials/delegates.html:51
 #: partials/modals/sendTransaction.html:13 partials/modals/userInfo.html:28
 #: partials/votes.html:49
-msgid "Send LSK"
-msgstr "Wyślij LSK"
+msgid "Send SHIFT"
+msgstr "Wyślij SHIFT"
 
 #: js/controllers/transactionsController.js:63 partials/account.html:70
 msgid "Sender"
@@ -1023,7 +1023,7 @@ msgstr ""
 msgid ""
 "This walkthrough will guide you through the necessary steps to create a "
 "multi-signature group. It's very important that you know what multi-"
-"signatures are, else you risk loosing your LSK balance.<br><br>A multi-"
+"signatures are, else you risk loosing your SHIFT balance.<br><br>A multi-"
 "signature group consists of N accounts, the one who created the group is the "
 "group owner. When the owner wants to make a transaction, M of N accounts "
 "within the group need to confirm it, otherwise the transaction will not be "
@@ -1035,7 +1035,7 @@ msgid ""
 msgstr ""
 "Ta instrukcja poprowadzi Cię krok po kroku przez niezbędne kroki do "
 "stworzenia grupy multisygnaturowej. To bardzo ważne, żebyś był świadom czym "
-"są multisygnatury, inaczej narażasz się na ryzyko straty swoich środków LSK. "
+"są multisygnatury, inaczej narażasz się na ryzyko straty swoich środków SHIFT. "
 "<br><br> Grupa multisygnaturowa składa się z N kont, to które ją stowrzyło "
 "jest jej właścicielem. Kiedy właściciel chce zrobić transakcje, M z N kont w "
 "grupie musi ją potwierdzić, w innym razie transakcja nie dojdzie do skutku. "

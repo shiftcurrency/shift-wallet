@@ -145,7 +145,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
         }
 
         if (amount == '') {
-            return error('LSK amount can not be blank');
+            return error('SHIFT amount can not be blank');
         }
 
         if (parts.length == 1) {
@@ -153,7 +153,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
             fraction = '00000000';
         } else if (parts.length == 2) {
             if (parts[1].length > 8) {
-                return error('LSK amount must not have more than 8 decimal places');
+                return error('SHIFT amount must not have more than 8 decimal places');
             } else if (parts[1].length <= 8) {
                 // Less than eight decimal places
                 fraction = parts[1];
@@ -162,7 +162,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
                 fraction = parts[1].substring(0, 8);
             }
         } else {
-            return error('LSK amount must have only one decimal point');
+            return error('SHIFT amount must have only one decimal point');
         }
 
         // Pad to eight decimal places
@@ -172,7 +172,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
 
         // Check for zero amount
         if (amount == '0' && fraction == '00000000') {
-            return error('LSK amount can not be zero');
+            return error('SHIFT amount can not be zero');
         }
 
         // Combine whole with fractional part
@@ -181,7 +181,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
         // In case there's a comma or something else in there.
         // At this point there should only be numbers.
         if (!/^\d+$/.test(result)) {
-            return error('LSK amount contains non-numeric characters');
+            return error('SHIFT amount contains non-numeric characters');
         }
 
         // Remove leading zeroes
