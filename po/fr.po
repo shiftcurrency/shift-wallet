@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Lisk\n"
+"Project-Id-Version: Shift\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
@@ -42,9 +42,9 @@ msgid "Account Verification"
 msgstr "Vérification du compte"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr ""
-"Ajouter des membres au groupe en saisissant leur adresse Lisk et valider par "
+"Ajouter des membres au groupe en saisissant leur adresse Shift et valider par "
 "Entrée."
 
 #: js/controllers/blockchainController.js:45
@@ -450,23 +450,23 @@ msgid "Latest version"
 msgstr "Dernière version"
 
 #: wallet.html:22
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - Plate-forme d’Application Blockchain"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - Plate-forme d’Application Blockchain"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Adresse Lisk"
+msgid "Shift Address"
+msgstr "Adresse Shift"
 
 #: partials/account.html:33
-msgid "Lisk Client"
-msgstr "Client Lisk"
+msgid "Shift Client"
+msgstr "Client Shift"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
-msgstr "Client Lisk périmé"
+msgid "Shift Client Outdated"
+msgstr "Client Shift périmé"
 
 #: js/controllers/walletsController.js:7
 msgid "Loading Multi-Signature Groups"
@@ -964,12 +964,12 @@ msgstr "Résumé"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"La plate-forme d’applications Lisk ne fournit pas encore pas de protection "
+"La plate-forme d’applications Shift ne fournit pas encore pas de protection "
 "contre les appels système non autorisés effectués à partir de l'application "
 "en cours d'exécution. Par conséquent, l'ouverture des applications non "
 "fiables n’est pas encore recommandée, et pourrait potentiellement conduire à "
@@ -977,13 +977,13 @@ msgstr ""
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
 msgstr ""
 "La phrase secrète maîtresse est généré automatiquement sur ​​le premier "
-"lancement du client Lisk. Elle peut être trouvée à la fin du fichier config."
+"lancement du client Shift. Elle peut être trouvée à la fin du fichier config."
 "json . Par conséquent, seuls les opérateurs de nœuds peuvent installer, "
 "lancer ou désinstaller des applications. Une fois que les applications sont "
 "dans un état lancé, tout le monde est libre d'ouvrir et de les utiliser."
@@ -1015,7 +1015,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Cette procédure vous guider pas à pas à travers les étapes nécessaires pour "
@@ -1028,7 +1028,7 @@ msgstr ""
 "spécifiées dans cette procédure.<br><br><b> Ce que vous devez savoir pour la "
 "configuration de groupe multi-signature :</b><br><br>• Le nombre de membres "
 "du groupe ( N).<br>• Le nombre de confirmations nécessaires (M).<br>• Les "
-"adresses des comptes Lisk que vous souhaitez ajouter au groupe."
+"adresses des comptes Shift que vous souhaitez ajouter au groupe."
 
 #: js/controllers/blockchainController.js:43
 #: js/controllers/forgingController.js:116
@@ -1267,8 +1267,8 @@ msgstr "{{voteList.length}} sur {{count}} délégués sélectionnés"
 #~ msgid "Installed Dapps"
 #~ msgstr "Dapps installées"
 
-#~ msgid "Lisk - Decentralized Application Platform"
-#~ msgstr "Lisk - Platforme d'Application Décentralisée"
+#~ msgid "Shift - Decentralized Application Platform"
+#~ msgstr "Shift - Platforme d'Application Décentralisée"
 
 #~ msgid "LISK Address"
 #~ msgstr "LISK Adresse"
@@ -1289,7 +1289,7 @@ msgstr "{{voteList.length}} sur {{count}} délégués sélectionnés"
 #~ "Make sure you're sending LISK to the right address. This action can't be "
 #~ "undone later."
 #~ msgstr ""
-#~ "Assurez-vous d'envoyez vos Lisk à la bonne adresse . Cette action ne peut "
+#~ "Assurez-vous d'envoyez vos Shift à la bonne adresse . Cette action ne peut "
 #~ "être annulée par la suite."
 
 #~ msgid "No dapps matching your search criteria were found."
@@ -1341,7 +1341,7 @@ msgstr "{{voteList.length}} sur {{count}} délégués sélectionnés"
 #~ "will not be processed. The values M and N are specified in this "
 #~ "walkthrough.<br><br><b>Things you need to know for the multi-signature "
 #~ "group setup:</b><br><br>• The number of group members (N).<br>• The "
-#~ "number of needed confirmations (M).<br>• The addresses of the Lisk "
+#~ "number of needed confirmations (M).<br>• The addresses of the Shift "
 #~ "accounts you want to add to the group."
 #~ msgstr ""
 #~ "Cette procédure vous guider pas à pas à travers les étapes nécessaires "
@@ -1371,7 +1371,7 @@ msgstr "{{voteList.length}} sur {{count}} délégués sélectionnés"
 #~ "this walkthrough.&lt;br&gt;&lt;br&gt;&lt;b&gt;Things you need to know for "
 #~ "the multi-signature group setup:&lt;/b&gt;&lt;br&gt;&lt;br&gt;• The "
 #~ "number of group members (N).&lt;br&gt;• The number of needed "
-#~ "confirmations (M).&lt;br&gt;• The addresses of the Lisk accounts you want "
+#~ "confirmations (M).&lt;br&gt;• The addresses of the Shift accounts you want "
 #~ "to add to the group."
 #~ msgstr ""
 #~ "Cette procédure vous guider pas à pas à travers les étapes nécessaires "

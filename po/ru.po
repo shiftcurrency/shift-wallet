@@ -64,8 +64,8 @@ msgid "Add a new application"
 msgstr "Добавить новое приложение"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
-msgstr "Добавьте членов группы, введя их адреса Lisk, а затем нажмите Enter"
+msgid "Add group members by typing in their Shift address and pressing enter."
+msgstr "Добавьте членов группы, введя их адреса Shift, а затем нажмите Enter"
 
 #: partials/modals/secondPassphraseModal.html:126
 msgid "ADD SECOND PASSPHRASE"
@@ -454,22 +454,22 @@ msgid "LAUNCH"
 msgstr "ПУСК"
 
 #: wallet.html:20
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - Платформа децентрализованных приложений"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - Платформа децентрализованных приложений"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Адрес Lisk"
+msgid "Shift Address"
+msgstr "Адрес Shift"
 
 #: partials/account.html:33
-msgid "Lisk Client"
+msgid "Shift Client"
 msgstr "Клиент LISK"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
+msgid "Shift Client Outdated"
 msgstr "Версия LISK устарела!"
 
 #: js/controllers/dappController.js:7
@@ -986,19 +986,19 @@ msgstr "Итог"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"Lisk в настоящее время не обеспечивает защиту от несанкционированных "
+"Shift в настоящее время не обеспечивает защиту от несанкционированных "
 "системных вызовов, совершенных активным приложением. Поэтому запуск не "
 "доверенного приложения не рекомендуется и может привести к потере средств на "
 "счете."
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
@@ -1035,7 +1035,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Это руководство поможет вам пройти необходимые шаги для создания группы с "
@@ -1232,7 +1232,7 @@ msgstr "Ваш дополнительный пароль"
 #~ msgid "Installed Dapps"
 #~ msgstr "Установленные DApp"
 
-#~ msgid "Lisk - Decentralized Application Platform"
+#~ msgid "Shift - Decentralized Application Platform"
 #~ msgstr "LISK - Платформа для децентрализованных приложений"
 
 #~ msgid "LISK Address"
@@ -1309,7 +1309,7 @@ msgstr "Ваш дополнительный пароль"
 #~ "will not be processed. The values M and N are specified in this "
 #~ "walkthrough.<br><br><b>Things you need to know for the multi-signature "
 #~ "group setup:</b><br><br>• The number of group members (N).<br>• The "
-#~ "number of needed confirmations (M).<br>• The addresses of the Lisk "
+#~ "number of needed confirmations (M).<br>• The addresses of the Shift "
 #~ "accounts you want to add to the group."
 #~ msgstr ""
 #~ "Это руководство поможет вам пройти необходимые шаги для создания группы с "

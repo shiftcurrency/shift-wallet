@@ -59,9 +59,9 @@ msgid "Account Verification"
 msgstr "Kontoverifikation"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr ""
-"Lägg till gruppmedlemmar genom att skriva in deras Lisk-adress och trycka "
+"Lägg till gruppmedlemmar genom att skriva in deras Shift-adress och trycka "
 "enter"
 
 #: partials/modals/secondPassphraseModal.html:126
@@ -449,23 +449,23 @@ msgid "LAUNCH"
 msgstr "STARTA"
 
 #: wallet.html:22
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - Blockchain Application Platform"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - Blockchain Application Platform"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Lisk-Adress"
+msgid "Shift Address"
+msgstr "Shift-Adress"
 
 #: partials/account.html:33
-msgid "Lisk Client"
-msgstr "Lisk-Klient"
+msgid "Shift Client"
+msgstr "Shift-Klient"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
-msgstr "Ej Senaste Lisk-klienten"
+msgid "Shift Client Outdated"
+msgstr "Ej Senaste Shift-klienten"
 
 #: js/controllers/dappController.js:7
 #: js/controllers/dappsCategoryController.js:7
@@ -984,24 +984,24 @@ msgstr "Sammanfattning"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"Den här Lisk-applatformen erbjuder för närvarande inte något skydd mot "
+"Den här Shift-applatformen erbjuder för närvarande inte något skydd mot "
 "obehöriga systemanrop gjorda av programmet som körs. Att öppna ej pålitliga "
 "applikationer är därför inte rekommenderat, och kan potentiellt leda till "
 "förlust av tillgångar."
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
 msgstr ""
-"Master-lösenfrasen är auto-genererad när du först startar Lisk-klienten. Du "
+"Master-lösenfrasen är auto-genererad när du först startar Shift-klienten. Du "
 "kan finna den i slutet av config.json-filen. Därav kan endast nod-operatörer "
 "installera, starta och avinstallera applikationer. När väl en applikation "
 "har startats kan vem som helst öppna och använda dem."
@@ -1033,7 +1033,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Denna genomgång kommer att guida dig genom de nödvändiga stegen för att "
@@ -1044,7 +1044,7 @@ msgstr ""
 "gruppen bekräfta det, annars kommer transaktionen inte att behandlas. "
 "Värdena M och N anges i denna genomgång.<br><br><b>Saker du behöver veta för "
 "upprättningen av multi-signaturgruppen:</b><br>• Antalet gruppmedlemmar (N)."
-"<br>• Antalet behövda bekräftelser (M).<br> • Adresserna för Lisk-kontona du "
+"<br>• Antalet behövda bekräftelser (M).<br> • Adresserna för Shift-kontona du "
 "vill lägga till i gruppen."
 
 #: js/controllers/blockchainController.js:43

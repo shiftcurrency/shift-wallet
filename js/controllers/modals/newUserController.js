@@ -27,7 +27,7 @@ angular.module('liskApp').controller('newUserController', ["$scope", "$http", "n
 
     $scope.savePassToFile = function (pass) {
         var blob = new Blob([pass], { type: "text/plain;charset=utf-8" });
-        FS.saveAs(blob, "LiskPassphrase.txt");
+        FS.saveAs(blob, "ShiftPassphrase.txt");
     }
 
     $scope.login = function (pass) {

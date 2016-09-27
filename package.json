@@ -1,10 +1,10 @@
 {
   "name": "lisk-ui",
   "version": "0.0.0",
-  "description": "Lisk user-interface submodule",
+  "description": "Shift user-interface submodule",
   "repository": {
     "type": "git",
-    "url": "git@github.com:LiskHQ/lisk-ui.git"
+    "url": "git@github.com:ShiftHQ/lisk-ui.git"
   },
   "private": true,
   "author": "Vera Nekrasova <vera.limita@gmail.com>, Boris Povod <boris@crypti.me>",

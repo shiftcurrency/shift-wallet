@@ -64,9 +64,9 @@ msgid "Add a new application"
 msgstr "Nieuwe applicatie toevoegen"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr ""
-"Voeg groepsleden toe door hun Lisk adres in te geven en door op enter te "
+"Voeg groepsleden toe door hun Shift adres in te geven en door op enter te "
 "drukken."
 
 #: partials/modals/secondPassphraseModal.html:126
@@ -455,23 +455,23 @@ msgid "LAUNCH"
 msgstr "STARTEN"
 
 #: wallet.html:20
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - Blockchain Applicatie Platform"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - Blockchain Applicatie Platform"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Lisk Adres"
+msgid "Shift Address"
+msgstr "Shift Adres"
 
 #: partials/account.html:33
-msgid "Lisk Client"
-msgstr "Lisk Cliënt"
+msgid "Shift Client"
+msgstr "Shift Cliënt"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
-msgstr "Lisk Cliënt Verouderd"
+msgid "Shift Client Outdated"
+msgstr "Shift Cliënt Verouderd"
 
 #: js/controllers/dappController.js:7
 #: js/controllers/dappsCategoryController.js:7
@@ -988,25 +988,25 @@ msgstr "Samenvatting"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"Het Lisk applicatie platform biedt momenteel nog geen ondersteuning tegen "
+"Het Shift applicatie platform biedt momenteel nog geen ondersteuning tegen "
 "niet geauthorizeerde system calls van de lopende applicatie. Hierdoor "
 "adviseren wij om niet-vertrouwde applicaties niet te openen, deze kunnen "
 "leiden tot het verlies van uw balans."
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
 msgstr ""
 "De master wachtwoordzin is automatisch gegenereerd bij het eerst opstarten van "
-"de Lisk cliënt. Deze kan worden teruggevonden op het einde van het config."
+"de Shift cliënt. Deze kan worden teruggevonden op het einde van het config."
 "json bestand. Hierdoor kunnen enkel node operatoren een applicatie "
 "installeren, opstaren of verijwderen. Eens dat applicaties in hun draaiende "
 "staat zijn, is iedereen vrij om deze te openen en te gebruiken."
@@ -1038,7 +1038,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Deze walkthrough zal u gidsen door de nodige stappen om een multi-signature "
@@ -1051,7 +1051,7 @@ msgstr ""
 "worden gespecifieerd doorheen deze walkthrough.<br><br><b>Dingen die u moet "
 "weten voor de multi-signature groep op te zetten:</b><br><br>• Het aantal "
 "groepsleden (N).<br>• Het aantal benodigde bevestigingen (M).<br>• De "
-"adressen van de Lisk profielen die u aan de groep wil toevoegen."
+"adressen van de Shift profielen die u aan de groep wil toevoegen."
 
 #: js/controllers/blockchainController.js:43
 #: js/controllers/forgingController.js:116
@@ -1253,14 +1253,14 @@ msgstr "Uw Tweede Wachtwoordzin"
 #~ msgid "Installed Dapps"
 #~ msgstr "Geïnstalleerde Dapps"
 
-#~ msgid "Lisk - Decentralized Application Platform"
-#~ msgstr "Lisk - Gedecentraliseerde Applicaties Platform"
+#~ msgid "Shift - Decentralized Application Platform"
+#~ msgstr "Shift - Gedecentraliseerde Applicaties Platform"
 
 #~ msgid "LISK Amount"
 #~ msgstr "Aantal LISK"
 
 #~ msgid "LISK Earned"
-#~ msgstr "Lisk Verdiend"
+#~ msgstr "Shift Verdiend"
 
 #~ msgid "Loading dapp"
 #~ msgstr "Dapp aan het laden"

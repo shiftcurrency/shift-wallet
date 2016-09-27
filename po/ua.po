@@ -64,7 +64,7 @@ msgid "Add a new application"
 msgstr "Додати новий додаток"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr "Щоб додати членів групи введіть їх адресу та натисніть кнопку ENTER."
 
 #: partials/modals/secondPassphraseModal.html:126
@@ -452,23 +452,23 @@ msgid "LAUNCH"
 msgstr "ЗАПУСТИТИ"
 
 #: wallet.html:20
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - платформа для Blockchain додатків"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - платформа для Blockchain додатків"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Lisk Адреса"
+msgid "Shift Address"
+msgstr "Shift Адреса"
 
 #: partials/account.html:33
-msgid "Lisk Client"
-msgstr "Lisk Клієнт"
+msgid "Shift Client"
+msgstr "Shift Клієнт"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
-msgstr "Версія Lisk Клієнта застаріла"
+msgid "Shift Client Outdated"
+msgstr "Версія Shift Клієнта застаріла"
 
 #: js/controllers/dappController.js:7
 #: js/controllers/dappsCategoryController.js:7
@@ -987,24 +987,24 @@ msgstr "Підсумок"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"Платформа додатків Lisk в даний час не забезпечує захист від будь-яких "
+"Платформа додатків Shift в даний час не забезпечує захист від будь-яких "
 "несанкціонованих системних викликів, зроблених з запущеного додатку. Тому "
 "відкриття будь-яких ненадійних додатків ще не рекомендується, і потенційно "
 "може призвести до втрати коштів."
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
 msgstr ""
-"Майстер пароль генерується автоматично при першому запуску клієнта Lisk. "
+"Майстер пароль генерується автоматично при першому запуску клієнта Shift. "
 "Його можна знайти в кінці файлу config.json. Тому тільки оператори вузлів "
 "можуть встановлювати, запускати або видаляти додатки. Після того, як додатки "
 "знаходяться в запущеному стані, будь-хто може вільно відкривати і "
@@ -1037,7 +1037,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Цей покроковий посібник проведе вас через необхідні кроки для створення "
@@ -1048,7 +1048,7 @@ msgstr ""
 "підтвердити його, в іншому випадку угода не буде оброблятися. Значення М та "
 "N вказані в цьому посібнику <br><br><b>Речі, які потрібно знати для "
 "установки групи з мульти-підписом:</b><br><br>• Число членів групи (N).<br>• "
-"Кількість необхідних підтверджень (М).<br>• Адреси рахунків Lisk які ви "
+"Кількість необхідних підтверджень (М).<br>• Адреси рахунків Shift які ви "
 "хочете додати до групи."
 
 #: js/controllers/blockchainController.js:43
@@ -1251,8 +1251,8 @@ msgstr "Ваш другий пароль"
 #~ msgid "Installed Dapps"
 #~ msgstr "Встановлені Dapp"
 
-#~ msgid "Lisk - Decentralized Application Platform"
-#~ msgstr "Lisk - Платформа для децентралізованих додатків"
+#~ msgid "Shift - Decentralized Application Platform"
+#~ msgstr "Shift - Платформа для децентралізованих додатків"
 
 #~ msgid "LISK Amount"
 #~ msgstr "Кількість LISK"

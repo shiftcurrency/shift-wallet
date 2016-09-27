@@ -114,7 +114,7 @@ angular.module('liskApp').controller('votedDelegatesController', ['$scope', '$ro
     $scope.tableMyDelegates.cols = {
         rate : gettextCatalog.getString('Rank'),
         username : gettextCatalog.getString('Name'),
-        address : gettextCatalog.getString('Lisk Address'),
+        address : gettextCatalog.getString('Shift Address'),
         productivity : gettextCatalog.getString('Uptime'),
         vote : gettextCatalog.getString('Approval')
     };

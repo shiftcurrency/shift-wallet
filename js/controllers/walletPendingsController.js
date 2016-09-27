@@ -40,7 +40,7 @@ angular.module('liskApp').controller('walletPendingsController', ['$scope', '$ro
     });
 
     $scope.tableTransactions.cols = {
-        wallet : gettextCatalog.getString('Lisk Address'),
+        wallet : gettextCatalog.getString('Shift Address'),
         transactionId : gettextCatalog.getString('Transaction ID'),
         recipientId : gettextCatalog.getString('Recipient'),
         timestamp : gettextCatalog.getString('Time'),

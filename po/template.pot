@@ -36,7 +36,7 @@ msgid "Account Verification"
 msgstr ""
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr ""
 
 #: js/controllers/blockchainController.js:45
@@ -468,22 +468,22 @@ msgid "Latest version"
 msgstr ""
 
 #: wallet.html:22
-msgid "Lisk - Blockchain Application Platform"
+msgid "Shift - Blockchain Application Platform"
 msgstr ""
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
+msgid "Shift Address"
 msgstr ""
 
 #: partials/account.html:33
-msgid "Lisk Client"
+msgid "Shift Client"
 msgstr ""
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
+msgid "Shift Client Outdated"
 msgstr ""
 
 #: js/controllers/walletsController.js:7
@@ -962,11 +962,11 @@ msgid "Summary"
 msgstr ""
 
 #: partials/modals/openDappModal.html:19
-msgid "The Lisk apps platform currently does not provide any protection against any unauthorized system calls made from the running application. Therefore opening any untrusted applications is not yet advisable, and could potentially lead to loss of funds."
+msgid "The Shift apps platform currently does not provide any protection against any unauthorized system calls made from the running application. Therefore opening any untrusted applications is not yet advisable, and could potentially lead to loss of funds."
 msgstr ""
 
 #: partials/modals/masterPassphraseModal.html:30
-msgid "The master passphrase is auto-generated upon first launching the Lisk client. It can be found at the end of the config.json file. Therefore only node operators can install, launch or uninstall applications. Once applications are in a launched state, anyone is free to open and use them."
+msgid "The master passphrase is auto-generated upon first launching the Shift client. It can be found at the end of the config.json file. Therefore only node operators can install, launch or uninstall applications. Once applications are in a launched state, anyone is free to open and use them."
 msgstr ""
 
 #: partials/modals/newUser.html:68
@@ -978,7 +978,7 @@ msgid "The second passphrase entered doesn't match with the one generated before
 msgstr ""
 
 #: partials/modals/multisignatureModal.html:21
-msgid "This walkthrough will guide you through the necessary steps to create a multi-signature group. It's very important that you know what multi-signatures are, else you risk loosing your SHIFT balance.<br><br>A multi-signature group consists of N accounts, the one who created the group is the group owner. When the owner wants to make a transaction, M of N accounts within the group need to confirm it, otherwise the transaction will not be processed. The values M and N are specified in this walkthrough.<br><br><b>Things you need to know for the multi-signature group setup:</b><br><br>• The number of group members (N).<br>• The number of needed confirmations (M).<br>• The addresses of the Lisk accounts you want to add to the group."
+msgid "This walkthrough will guide you through the necessary steps to create a multi-signature group. It's very important that you know what multi-signatures are, else you risk loosing your SHIFT balance.<br><br>A multi-signature group consists of N accounts, the one who created the group is the group owner. When the owner wants to make a transaction, M of N accounts within the group need to confirm it, otherwise the transaction will not be processed. The values M and N are specified in this walkthrough.<br><br><b>Things you need to know for the multi-signature group setup:</b><br><br>• The number of group members (N).<br>• The number of needed confirmations (M).<br>• The addresses of the Shift accounts you want to add to the group."
 msgstr ""
 
 #: js/controllers/blockchainController.js:43

@@ -64,9 +64,9 @@ msgid "Add a new application"
 msgstr "Neue App hinzufügen"
 
 #: partials/modals/multisignatureModal.html:46
-msgid "Add group members by typing in their Lisk address and pressing enter."
+msgid "Add group members by typing in their Shift address and pressing enter."
 msgstr ""
-"Füge Gruppenmitglieder hinzu, indem du ihre Lisk Adresse eingibst und Enter "
+"Füge Gruppenmitglieder hinzu, indem du ihre Shift Adresse eingibst und Enter "
 "drückst."
 
 #: partials/modals/secondPassphraseModal.html:126
@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Um Delegate zu werden musst du dich registrieren. Wähle dazu einen Delegate "
 "Namen, welchen du benutzen kannst um deinen Delegate bekannt zu machen. "
-"Lediglich die Top 101 Delegates können die Lisk Blockchain sichern. Alle "
+"Lediglich die Top 101 Delegates können die Shift Blockchain sichern. Alle "
 "Netzwerkgebühren werden gleichermaßen zwischen den Top 101 Delegates "
 "aufgeteilt."
 
@@ -456,23 +456,23 @@ msgid "LAUNCH"
 msgstr "STARTEN"
 
 #: wallet.html:20
-msgid "Lisk - Blockchain Application Platform"
-msgstr "Lisk - Blockchain Applikations Plattform"
+msgid "Shift - Blockchain Application Platform"
+msgstr "Shift - Blockchain Applikations Plattform"
 
 #: js/controllers/delegatesController.js:158
 #: js/controllers/votedDelegatesController.js:117
 #: js/controllers/walletPendingsController.js:43
 #: partials/modals/multisignatureModal.html:52
-msgid "Lisk Address"
-msgstr "Lisk Adresse"
+msgid "Shift Address"
+msgstr "Shift Adresse"
 
 #: partials/account.html:33
-msgid "Lisk Client"
-msgstr "Lisk Client"
+msgid "Shift Client"
+msgstr "Shift Client"
 
 #: partials/account.html:43
-msgid "Lisk Client Outdated"
-msgstr "Lisk Client Veraltet"
+msgid "Shift Client Outdated"
+msgstr "Shift Client Veraltet"
 
 #: js/controllers/dappController.js:7
 #: js/controllers/dappsCategoryController.js:7
@@ -993,22 +993,22 @@ msgstr "Zusammenfassung"
 
 #: partials/modals/openDappModal.html:19
 msgid ""
-"The Lisk apps platform currently does not provide any protection against any "
+"The Shift apps platform currently does not provide any protection against any "
 "unauthorized system calls made from the running application. Therefore "
 "opening any untrusted applications is not yet advisable, and could "
 "potentially lead to loss of funds."
 msgstr ""
-"Die Lisk app Plattform bietet aktuell keine Sicherungsmaßnahmen gegen "
+"Die Shift app Plattform bietet aktuell keine Sicherungsmaßnahmen gegen "
 "unauthorisierte Systemaufrufe ausgehend von der laufenden Applikation an."
 
 #: partials/modals/masterPassphraseModal.html:30
 msgid ""
-"The master passphrase is auto-generated upon first launching the Lisk "
+"The master passphrase is auto-generated upon first launching the Shift "
 "client. It can be found at the end of the config.json file. Therefore only "
 "node operators can install, launch or uninstall applications. Once "
 "applications are in a launched state, anyone is free to open and use them."
 msgstr ""
-"Die Master Passphrase wurde beim ersten Start von Lisk automatisch "
+"Die Master Passphrase wurde beim ersten Start von Shift automatisch "
 "generiert. Du findest sie am Ende der config.json Datei. Sie verhindert das "
 "jeder Nutzer Apps installieren, starten und deinstallieren kann. Sobald eine "
 "App einmal gestartet wurde, kann sie jeder öffnen und benutzen."
@@ -1040,7 +1040,7 @@ msgid ""
 "processed. The values M and N are specified in this walkthrough."
 "<br><br><b>Things you need to know for the multi-signature group setup:</"
 "b><br><br>• The number of group members (N).<br>• The number of needed "
-"confirmations (M).<br>• The addresses of the Lisk accounts you want to add "
+"confirmations (M).<br>• The addresses of the Shift accounts you want to add "
 "to the group."
 msgstr ""
 "Diese Schritt für Schritt Anleitung führt dich durch die benötigten Schritte "
@@ -1053,7 +1053,7 @@ msgstr ""
 "verschickt. Die Werte für M und N werden in den nächsten Schritten bestimmt."
 "<br><br><b>Sachen die du über Multi-Signature Gruppen wissen musst:</"
 "b><br><br>• The Anzahl an Gruppen Mitgliedern (N).<br>• Die Anzahl der "
-"benötigten Bestätigungen (M).<br>• Die Adressen der Lisk Accounts, die du zu "
+"benötigten Bestätigungen (M).<br>• Die Adressen der Shift Accounts, die du zu "
 "deiner Multi-Signature Gruppe hinzufügen möchtest."
 
 #: js/controllers/blockchainController.js:43
@@ -1256,8 +1256,8 @@ msgstr "Deine 2. Passphrase"
 #~ msgid "Installed Dapps"
 #~ msgstr "Installierte Dapps"
 
-#~ msgid "Lisk - Decentralized Application Platform"
-#~ msgstr "Lisk - Die Dezentrale Applikations Plattform"
+#~ msgid "Shift - Decentralized Application Platform"
+#~ msgstr "Shift - Die Dezentrale Applikations Plattform"
 
 #~ msgid "LISK Amount"
 #~ msgstr "LISK Summe"
