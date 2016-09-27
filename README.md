@@ -1,8 +1,6 @@
-# Lisk UI
+# SHIFT UI
 
-Lisk is a next generation crypto-currency and blockchain application platform, written entirely in JavaScript. For more information please refer to our website: https://lisk.io/.
-
-This repository contains the [AngularJS](https://angularjs.org/) based user-interface submodule of the Lisk client.
+This repository contains the [AngularJS](https://angularjs.org/) based user-interface submodule of the SHIFT client.
 
 ## Installation
 
@@ -25,7 +23,7 @@ grunt release
 ```
 
 ## Authors
-
+- Crush - ShiftTeam <shiftcurrency@gmail.com>
 - Vera Nekrasova <vera.limita@gmail.com>
 - Boris Povod <boris@crypti.me>
 - Oliver Beddows <oliver@lisk.io>
@@ -35,6 +33,7 @@ grunt release
 
 The MIT License (MIT)  
 
+Copyright (c) 2016 Shift
 Copyright (c) 2016 Lisk  
 Copyright (c) 2014-2015 Crypti  
 
