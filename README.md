@@ -1,56 +1,45 @@
-# shiftwallet
+# Lisk UI
 
-Shift QT5 Wallet
+Lisk is a next generation crypto-currency and blockchain application platform, written entirely in JavaScript. For more information please refer to our website: https://lisk.io/.
 
-ShiftWallet is a free software wallet/front-end for Shift Gshift*.
+This repository contains the [AngularJS](https://angularjs.org/) based user-interface submodule of the Lisk client.
 
-## Usage
+## Installation
 
-Gshift 2.6.0+ is required to be running for ShiftWallet to work.
+Install node modules:
 
-ShiftWallet should auto-detect gshift's IPC file/name and work "out of the box" as long as gshift is running.
+```
+npm install
+```
 
-If ShiftWallet fails to detect the IPC file/name you can specify it in the settings panel.
+Install bower components:
 
-Shiftwallet will show gshift's syncing progress and only process blocks after it's done.
+```
+bower install
+```
+
+Build the user-interface:
+
+```
+grunt release
+```
+
+## Authors
+
+- Vera Nekrasova <vera.limita@gmail.com>
+- Boris Povod <boris@crypti.me>
+- Oliver Beddows <oliver@lisk.io>
+- Max Kordek <max@lisk.io>
 
 ## License
 
-ShiftWallet is licensed under the GPLv3 license. See LICENSE for more info.
+The MIT License (MIT)  
 
-## Donations
+Copyright (c) 2016 Lisk  
+Copyright (c) 2014-2015 Crypti  
 
-#### Flattr
-[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=Almindor&url=https://github.com/almindor/shiftwallet&title=ShiftWallet&language=&tags=github&category=software)
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  
 
-#### Bitcoin
-`1NcJoao879C1pSKvFqnUKD6wKtFpCMppP6`
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-#### Litecoin
-`LcTfGmqpXCiG7UikBDTa4ZiJMS5cRxSXHm`
-
-#### Ether
-`0xc64b50db57c0362e27a32b65bd29363f29fdfa59`
-
-## Development
-
-### Requirements
-
-Gshift 2.6.0+
-
-Qt5.2+ with qmake
-
-### Building
-
-qmake -config release && make
-
-### Roadmap
-
-- 1.1+ add eth support
-- 1.0 add gshift account backup and restore
-- 0.9 add transaction history support [done]
-- 0.8 initial release [done]
-
-### Caveats & bugs
-
-Only supported client at the moment is Gshift. Eth and others should work if you go to settings and set the IPC path/name properly.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
