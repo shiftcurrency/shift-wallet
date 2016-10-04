@@ -43,7 +43,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
     }
 
     function validateForm (onValid) {
-        var isAddress = /^[0-9]+[L|l]$/g;
+        var isAddress = /^[0-9]+[S|s]$/g;
         var correctAddress = isAddress.test($scope.to);
 
         $scope.errorMessage = {};
