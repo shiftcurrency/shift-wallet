@@ -190,7 +190,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
         return parseInt(result);
     }
 
-    $scope.convertLISK = function (currency) {
+    $scope.convertSHIFT = function (currency) {
         return $scope.isCorrectValue(currency, true);
     }
 
@@ -209,7 +209,7 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
 
         var data = {
             secret: secretPhrase,
-            amount: $scope.convertLISK($scope.amount),
+            amount: $scope.convertSHIFT($scope.amount),
             recipientId: $scope.to,
             publicKey: userService.publicKey
         };
