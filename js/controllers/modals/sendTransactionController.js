@@ -210,9 +210,12 @@ angular.module('liskApp').controller('sendTransactionController', ['$scope', 'se
         var data = {
             secret: secretPhrase,
             amount: $scope.convertSHIFT($scope.amount),
-            recipientId: $scope.to,
-            publicKey: userService.publicKey
+            recipientId: $scope.to
         };
+
+	if (userService.publicKey) {
+	    data.publicKey = userService.publicKey;
+	}
 
         if ($scope.secondPassphrase) {
             data.secondSecret = $scope.secondPhrase;
