@@ -9,7 +9,7 @@ angular.module('liskApp').directive('validLink', function () {
         },
         link: function (scope, element, attrs, ctrl) {
             scope.validLink = (!scope.validLink) ? '' : scope.validLink;
-            var regexp = new RegExp('^(http[s]?:\/\/)([a-z0-9-./]+)(' + scope.validLink + ')$', 'i');
+            var regexp = new RegExp('^(http[s]?:\/\/)([a-z0-9-./_]+)(' + scope.validLink + ')$', 'i');
 
             ctrl.$validators.validLink = function (modelValue, viewValue) {
               var value = (modelValue || viewValue);
